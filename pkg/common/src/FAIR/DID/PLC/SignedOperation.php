@@ -2,38 +2,41 @@
 
 namespace FAIR\DID\PLC;
 
-use Exception;
+use RuntimeException;
 
-class SignedOperation extends Operation {
-	public readonly string $sig;
+class SignedOperation extends Operation
+{
+    public readonly string $sig;
 
-	public function __construct(
-		Operation $operation,
-		string $sig,
-	) {
-		parent::__construct(
-			$operation->type,
-			$operation->rotationKeys,
-			$operation->verificationMethods,
-			$operation->alsoKnownAs,
-			$operation->services,
-			$operation->prev,
-		);
+    public function __construct(
+        Operation $operation,
+        string $sig,
+    ) {
+        parent::__construct(
+            $operation->type,
+            $operation->rotationKeys,
+            $operation->verificationMethods,
+            $operation->alsoKnownAs,
+            $operation->services,
+            $operation->prev,
+        );
 
-		$this->sig = $sig;
-	}
+        $this->sig = $sig;
+    }
 
-	public function validate() : bool {
-		if ( empty( $this->sig ) ) {
-			throw new Exception( 'Signature is empty' );
-		}
+    public function validate(): bool
+    {
+        if (empty($this->sig)) {
+            throw new RuntimeException('Signature is empty');
+        }
 
-		return parent::validate();
-	}
+        return parent::validate();
+    }
 
-	public function jsonSerialize() : array {
-		$data = parent::jsonSerialize();
-		$data['sig'] = $this->sig;
-		return $data;
-	}
+    public function jsonSerialize(): array
+    {
+        $data = parent::jsonSerialize();
+        $data['sig'] = $this->sig;
+        return $data;
+    }
 }

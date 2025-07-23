@@ -6,12 +6,12 @@ namespace MiniFAIR\PLC\JunkDrawer;
 use Elliptic\EC;
 use Elliptic\EC\KeyPair;
 use Exception;
+use RuntimeException;
 use YOCLIB\Multiformats\Multibase\Multibase;
 
 class Keys {
-
-    const CURVE_K256 = 'secp256k1';
-    const CURVE_P256 = 'p256';
+    const string CURVE_K256 = 'secp256k1';
+    const string CURVE_P256 = 'p256';
 
     /**
      * Generate a new keypair.
@@ -99,11 +99,11 @@ class Keys {
      */
     public static function decode_did_key( string $did ) : KeyPair {
         if ( ! str_starts_with( $did, 'did:key:' ) ) {
-            throw new Exception( 'Invalid DID format' );
+            throw new RuntimeException( 'Invalid DID format' );
         }
         $did = substr( $did, 8 );
         if ( ! str_starts_with( $did, 'z' ) ) {
-            throw new Exception( 'Invalid DID format' );
+            throw new RuntimeException( 'Invalid DID format' );
         }
 
         return self::decode_public_key( $did );
@@ -127,8 +127,7 @@ class Keys {
             default => throw new Exception( 'Unsupported curve' ),
         };
 
-        $encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $pub ) );
-        return $encoded;
+        return Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $pub ) );
     }
 
     /**
@@ -149,8 +148,7 @@ class Keys {
             default => throw new Exception( 'Unsupported curve' ),
         };
 
-        $encoded = Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
-        return $encoded;
+        return Multibase::encode( Multibase::BASE58BTC, hex2bin( $prefix . $priv ));
     }
 
     /**

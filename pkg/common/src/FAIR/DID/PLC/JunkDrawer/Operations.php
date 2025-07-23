@@ -30,14 +30,13 @@ class Operations
      * @internal Elliptic does not support compact signatures, only DER-encoded, so
      *           we need to do it ourselves. Compact signatures are just the r and
      *           s bytes concatenated, but must be padded to 32 bytes each.
-     *
      */
     public static function signature_to_compact(EC $ec, Signature $signature): string
     {
         $byte_length = ceil($ec->curve->n->bitLength() / 8);
-        $compact = Utils::toHex($signature->r->toArray('be', $byte_length)) . Utils::toHex($signature->s->toArray('be',
-                $byte_length));
-        return $compact;
+        $r = Utils::toHex($signature->r->toArray('be', $byte_length));
+        $s = Utils::toHex($signature->s->toArray('be', $byte_length));
+        return $r . $s;
     }
 
     /**
@@ -58,11 +57,9 @@ class Operations
         /**
          * Hash with SHA-256, then sign, using canonical (low-S) form.
          *
-         * @var \Elliptic\EC\Signature
+         * @var Signature $signature
          */
-        $signature = $signing_key->sign(hash('sha256', $encoded, false), 'hex', [
-            'canonical' => true,
-        ]);
+        $signature = $signing_key->sign(hash('sha256', $encoded), 'hex', ['canonical' => true]);
 
         // Convert to compact (IEEE-P1363) form, then to base64url.
         $sig_string = Encode::base64url_encode(hex2bin(self::signature_to_compact($signing_key->ec, $signature)));
@@ -190,8 +187,7 @@ class Operations
         $cid .= $hash;
 
         // Then, encode to base32 multibase.
-        $cid = Multibase::encode(Multibase::BASE32, $cid);
-        return $cid;
+        return Multibase::encode(Multibase::BASE32, $cid);
     }
 
 

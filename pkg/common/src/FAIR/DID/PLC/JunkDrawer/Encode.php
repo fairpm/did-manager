@@ -2,11 +2,12 @@
 
 namespace MiniFAIR\PLC\JunkDrawer;
 
-use Exception;
+use RuntimeException;
 
-class Encode {
-    const BASE32_BITS_5_RIGHT = 31;
-    const BASE32_CHARS = 'abcdefghijklmnopqrstuvwxyz234567';
+class Encode
+{
+    public const int BASE32_BITS_5_RIGHT = 31;
+    public const string BASE32_CHARS = 'abcdefghijklmnopqrstuvwxyz234567';
 
     /**
      * Encode a binary string into a base64url string.
@@ -16,8 +17,9 @@ class Encode {
      * @param string $data The binary string to encode.
      * @return string The base64url encoded string.
      */
-    public static function base64url_encode( string $data ) : string {
-        return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
+    public static function base64url_encode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     /**
@@ -28,10 +30,11 @@ class Encode {
      * @param string $data The base64url string to decode.
      * @return string The decoded binary string.
      */
-    public static function base64url_decode( string $data ) : string {
-        $translated = strtr( $data, '-_', '+/' );
-        $padded = str_pad( $translated, strlen( $data ) % 4, '=', STR_PAD_RIGHT );
-        return base64_decode( $padded );
+    public static function base64url_decode(string $data): string
+    {
+        $translated = strtr($data, '-_', '+/');
+        $padded = str_pad($translated, strlen($data) % 4, '=');
+        return base64_decode($padded);
     }
 
     /**
@@ -41,34 +44,31 @@ class Encode {
      * @license https://github.com/bbars/utils/blob/master/LICENSE MIT
      * @see https://github.com/bbars/utils
      */
-    public static function base32_encode($data, $padRight = false) {
+    public static function base32_encode(string $data, $padRight = false): string
+    {
         $dataSize = strlen($data);
         $res = '';
         $remainder = 0;
         $remainderSize = 0;
 
-        for ($i = 0; $i < $dataSize; $i++)
-        {
+        for ($i = 0; $i < $dataSize; $i++) {
             $b = ord($data[$i]);
             $remainder = ($remainder << 8) | $b;
             $remainderSize += 8;
-            while ($remainderSize > 4)
-            {
+            while ($remainderSize > 4) {
                 $remainderSize -= 5;
                 $c = $remainder & (self::BASE32_BITS_5_RIGHT << $remainderSize);
                 $c >>= $remainderSize;
                 $res .= self::BASE32_CHARS[$c];
             }
         }
-        if ($remainderSize > 0)
-        {
+        if ($remainderSize > 0) {
             // remainderSize < 5:
             $remainder <<= (5 - $remainderSize);
             $c = $remainder & self::BASE32_BITS_5_RIGHT;
             $res .= self::BASE32_CHARS[$c];
         }
-        if ($padRight)
-        {
+        if ($padRight) {
             $padSize = (8 - ceil(($dataSize % 5) * 8 / 5)) % 8;
             $res .= str_repeat('=', $padSize);
         }
@@ -82,7 +82,8 @@ class Encode {
      * @license https://github.com/bbars/utils/blob/master/LICENSE MIT
      * @see https://github.com/bbars/utils
      */
-    public static function base32_decode($data) {
+    public static function base32_decode(string $data): string
+    {
         $data = rtrim($data, "=\x20\t\n\r\0\x0B");
         $dataSize = strlen($data);
         $buf = 0;
@@ -91,20 +92,21 @@ class Encode {
         $charMap = array_flip(str_split(self::BASE32_CHARS)); // char=>value map
         $charMap += array_flip(str_split(strtoupper(self::BASE32_CHARS))); // add upper-case alternatives
 
-        for ($i = 0; $i < $dataSize; $i++)
-        {
+        for ($i = 0; $i < $dataSize; $i++) {
             $c = $data[$i];
-            if (!isset($charMap[$c]))
-            {
-                if ($c == " " || $c == "\r" || $c == "\n" || $c == "\t")
-                    continue; // ignore these safe characters
-                throw new Exception('Encoded string contains unexpected char #'.ord($c)." at offset $i (using improper alphabet?)");
+            if (!isset($charMap[$c])) {
+                if ($c === " " || $c === "\r" || $c === "\n" || $c === "\t") {
+                    // ignore these safe characters
+                    continue;
+                }
+                throw new RuntimeException('Encoded string contains unexpected char #'
+                    . ord($c)
+                    . " at offset $i (using improper alphabet?)");
             }
             $b = $charMap[$c];
             $buf = ($buf << 5) | $b;
             $bufSize += 5;
-            if ($bufSize > 7)
-            {
+            if ($bufSize > 7) {
                 $bufSize -= 8;
                 $b = ($buf & (0xff << $bufSize)) >> $bufSize;
                 $res .= chr($b);
@@ -113,6 +115,5 @@ class Encode {
 
         return $res;
     }
-
 }
 
