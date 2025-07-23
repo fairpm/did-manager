@@ -19,10 +19,9 @@ use IteratorAggregate;
 /**
  * MapObject, implementing the canonicalization algorithm.
  *
- * This implements section 3.9 canonicalization, i.e. sort keys by length, then
- * by lower (byte) value.
- *
- * (The main change here is in ->__toString())
+ * This implements section 3.9 canonicalization, i.e. sort keys by length, then by lower (byte) value.
+ * This canonicalization is done only when serialized, i.e. in __toString().
+ * If you need the keys put in canonical order before then, call the ->canonicalize() method manually.
  *
  * @internal Unfortunately, MapObject is Final, so we need to duplicate the code.
  *
@@ -31,61 +30,57 @@ use IteratorAggregate;
  */
 class CanonicalMapObject extends AbstractCBORObject implements Countable, IteratorAggregate, Normalizable, ArrayAccess
 {
-    private const MAJOR_TYPE = self::MAJOR_TYPE_MAP;
+    private const int MAJOR_TYPE = self::MAJOR_TYPE_MAP;
 
-    /**
-     * @var MapItem[]
-     */
+    /** @var array<string, MapItem> */
     private array $data;
 
     private ?string $length = null;
 
-    /**
-     * @param MapItem[] $data
-     */
+    /** @param array<string, MapItem> $data */
     public function __construct(array $data = [])
     {
-        [$additionalInformation, $length] = LengthCalculator::getLengthOfArray($data);
-        array_map(static function ($item): void {
+        foreach ($data as $item) {
             if (! $item instanceof MapItem) {
                 throw new InvalidArgumentException('The list must contain only MapItem objects.');
             }
-        }, $data);
+        }
 
+        [$additionalInformation, $length] = LengthCalculator::getLengthOfArray($data);
         parent::__construct(self::MAJOR_TYPE, $additionalInformation);
+
         $this->data = $data;
         $this->length = $length;
     }
 
+    // This whole class exists to add this one method and call it in __toString().  `final` sucks.
+    public function canonicalize(): void {
+        uksort($this->data, fn($a, $b) => strlen($a) === strlen($b) ? strcmp($a, $b) : strlen($a) <=> strlen($b));
+
+        // I bet this is faster, but it's not tested against the spec or reference above, so it's not enabled yet
+        // ksort($this->data, SORT_STRING);
+        // uksort($this->data, fn($a, $b) => strlen($a) <=> strlen($b));
+    }
+
     public function __toString(): string
     {
-        uksort($this->data, function ($a, $b) {
-            if (strlen($a) === strlen($b) ) {
-                return strcmp($a, $b);
-            }
-
-            return strlen($a) <=> strlen($b);
-        });
+        $this->canonicalize();
 
         $result = parent::__toString();
+
         if ($this->length !== null) {
             $result .= $this->length;
         }
+
         foreach ($this->data as $object) {
-            $result .= $object->getKey()
-                ->__toString()
-            ;
-            $result .= $object->getValue()
-                ->__toString()
-            ;
+            $result .= $object->getKey()->__toString();
+            $result .= $object->getValue()->__toString();
         }
 
         return $result;
     }
 
-    /**
-     * @param MapItem[] $data
-     */
+    /** @param array<string, MapItem> $data */
     public static function create(array $data = []): self
     {
         return new self($data);
@@ -146,17 +141,13 @@ class CanonicalMapObject extends AbstractCBORObject implements Countable, Iterat
         return count($this->data);
     }
 
-    /**
-     * @return Iterator<int, MapItem>
-     */
+    /** @return Iterator<int, MapItem> */
     public function getIterator(): Iterator
     {
         return new ArrayIterator($this->data);
     }
 
-    /**
-     * @return array<int|string, mixed>
-     */
+    /** @return array<array-key, mixed> */
     public function normalize(): array
     {
         return array_reduce($this->data, static function (array $carry, MapItem $item): array {
@@ -197,4 +188,5 @@ class CanonicalMapObject extends AbstractCBORObject implements Countable, Iterat
     {
         $this->remove($offset);
     }
+
 }
