@@ -1,0 +1,26 @@
+# Ignore most hidden files and directories by default
+.*
+!.gitignore
+
+# Directory patterns (none yet)
+
+# Directory names
+node_modules/
+out/
+tmp/
+vendor/
+
+# File patterns
+*.bak
+*.iml
+*.log
+*.secret
+*.secret.*
+*.tmp
+.env
+.env.*
+
+# File names
+.phpstorm.meta.php
+.pre-commit-config.yaml
+docker-compose.override.yml
