@@ -1,0 +1,47 @@
+{
+    "name": "fairpm/did-manager",
+    "description": "FAIR PHP CLI Tool for DID Management and WordPress Plugin/Theme Metadata Generation",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "FAIRPM",
+            "email": "info@fairpm.org"
+        }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "simplito/elliptic-php": "^1.0",
+        "spomky-labs/cbor-php": "^3.1",
+        "yocto/yoclib-multibase": "^1.2"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+        "phpunit/phpunit": "^10.0",
+        "squizlabs/php_codesniffer": "^3.13",
+        "wp-coding-standards/wpcs": "^3.3"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/"
+        ]
+    },
+    "scripts": {
+        "tests": "phpunit",
+        "lint": "phpcs",
+        "format": "phpcbf"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

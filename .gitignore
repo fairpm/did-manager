@@ -1,26 +1,55 @@
-# Ignore most hidden files and directories by default
-.*
-!.gitignore
+# FAIR CLI - Dependencies and generated files
 
-# Directory patterns (none yet)
+# Composer
+/vendor/
+composer.lock
 
-# Directory names
-node_modules/
-out/
-tmp/
-vendor/
+# Data directory (keep structure, ignore contents)
+/data/*
+!/data/.gitkeep
 
-# File patterns
-*.bak
-*.iml
+# Local key storage (contains private keys - never commit!)
+*.keys.json
+fair-keys.json
+.fair-keys.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated files
 *.log
-*.secret
-*.secret.*
+*.cache
 *.tmp
-.env
-.env.*
 
-# File names
-.phpstorm.meta.php
-.pre-commit-config.yaml
-docker-compose.override.yml
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+phpunit.xml
+
+# Build artifacts
+/build/
+/dist/
+
+# Coverage reports
+/coverage/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+/tmp/
