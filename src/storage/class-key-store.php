@@ -58,7 +58,7 @@ class KeyStore {
 	private function save(): void {
 		$dir = dirname( $this->store_path );
 		if ( ! is_dir( $dir ) ) {
-			if ( ! mkdir( $dir, 0700, true ) ) {
+			if ( ! mkdir( $dir, 0600, true ) ) {
 				throw new \RuntimeException( "Unable to create directory: {$dir}" );
 			}
 		}

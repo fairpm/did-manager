@@ -126,7 +126,7 @@ class KeyExporter {
 		if ( null !== $file_path ) {
 			$dir = dirname( $file_path );
 			if ( ! is_dir( $dir ) ) {
-				mkdir( $dir, 0755, true );
+				mkdir( $dir, 0600, true );
 			}
 			return false !== file_put_contents( $file_path, $output );
 		}
