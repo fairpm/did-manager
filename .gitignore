@@ -1,55 +1,41 @@
-# FAIR CLI - Dependencies and generated files
+#### ignore all dotfiles and dot-dirs, with exceptions
+.*
+!.config/
+!.distignore
+!.dockerignore
+!.editorconfig
+!.env.example
+!.gitattributes
+!.gitignore
 
-# Composer
-/vendor/
-composer.lock
+#### ignore these patterns
+*.bak
+*.log
+*.tmp
+*.local
+*.local.*
+*.secret
+*.secret.*
 
-# Data directory (keep structure, ignore contents)
-/data/*
-!/data/.gitkeep
+#### ignore these specific directories
+tmp/
+vendor/
+
+#### ignore these specific files
+auth.json
+docker-compose.override.yml
 
 # Local key storage (contains private keys - never commit!)
 *.keys.json
 fair-keys.json
 .fair-keys.json
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.project
-.settings/
+# misc
+*.cache
 *.sublime-project
 *.sublime-workspace
-
-# OS
-.DS_Store
+*.swo
+*.swp
+*~
 Thumbs.db
 desktop.ini
-
-# Generated files
-*.log
-*.cache
-*.tmp
-
-# PHPUnit
-.phpunit.result.cache
-.phpunit.cache/
-phpunit.xml
-
-# Build artifacts
-/build/
-/dist/
-
-# Coverage reports
-/coverage/
-
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Temporary files
-/tmp/
