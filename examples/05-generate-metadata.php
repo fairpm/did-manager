@@ -10,11 +10,11 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+use FAIR\DID\Parsers\MetadataGenerator;
+use FAIR\DID\Parsers\PluginHeaderParser;
+use FAIR\DID\Parsers\ReadmeParser;
 
-use FairDidManager\Parsers\PluginHeaderParser;
-use FairDidManager\Parsers\ReadmeParser;
-use FairDidManager\Parsers\MetadataGenerator;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 echo "=== FAIR CLI: Metadata Generation Examples ===\n\n";
 

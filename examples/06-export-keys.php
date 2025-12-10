@@ -10,11 +10,11 @@
 
 declare(strict_types=1);
 
-require_once dirname( __DIR__ ) . '/vendor/autoload.php';
+use FAIR\DID\Keys\EcKey;
+use FAIR\DID\Keys\EdDsaKey;
+use FAIR\DID\Keys\Key;
 
-use FairDidManager\Keys\EcKey;
-use FairDidManager\Keys\EdDsaKey;
-use FairDidManager\Keys\Key;
+require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
 echo "=== FAIR DID Manager: Key Export Examples ===\n\n";
 

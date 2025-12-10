@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+use FAIR\DID\Crypto\DidCodec;
+use FAIR\DID\Sorage\KeyStore;
 
-use FairDidManager\Storage\KeyStore;
-use FairDidManager\Crypto\DidCodec;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 echo "=== FAIR CLI: Key Storage Examples ===\n\n";
 

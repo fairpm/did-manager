@@ -10,11 +10,11 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+use FAIR\DID\Crypto\DidCodec;
+use FAIR\DID\Keys\EcKey;
+use FAIR\DID\Keys\KeyFactory;
 
-use FairDidManager\Crypto\DidCodec;
-use FairDidManager\Keys\EcKey;
-use FairDidManager\Keys\EdDsaKey;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 echo "=== FAIR CLI: Key Generation Examples ===\n\n";
 
@@ -77,8 +77,6 @@ echo 'EdDSA Signature (hex): ' . substr( $eddsa_signature, 0, 40 ) . "...\n\n";
 // -----------------------------------------------------------------------------
 echo "5. Converting to did:key Format\n";
 echo str_repeat( '-', 50 ) . "\n";
-
-use FairDidManager\Keys\KeyFactory;
 
 $did_key_rotation     = KeyFactory::encode_did_key( $rotation_key );
 $did_key_verification = KeyFactory::encode_did_key( $verification_key );

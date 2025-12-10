@@ -10,9 +10,9 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+use FAIR\DID\Parsers\PluginHeaderParser;
 
-use FairDidManager\Parsers\PluginHeaderParser;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 echo "=== FAIR CLI: Plugin Header Parsing Examples ===\n\n";
 

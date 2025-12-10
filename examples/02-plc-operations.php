@@ -10,11 +10,10 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../vendor/autoload.php';
+use FAIR\DID\Crypto\DidCodec;
+use FAIR\DID\PLC\PlcOperation;
 
-use FairDidManager\Crypto\DidCodec;
-use FairDidManager\Keys\KeyFactory;
-use FairDidManager\Plc\PlcOperation;
+require_once __DIR__ . '/../vendor/autoload.php';
 
 echo "=== FAIR CLI: PLC Operation Examples ===\n\n";
 
