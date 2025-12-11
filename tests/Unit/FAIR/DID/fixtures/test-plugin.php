@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: Test Plugin
  * Plugin URI: https://example.com/test-plugin
