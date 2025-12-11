@@ -17,6 +17,7 @@
     "yocto/yoclib-multibase": "^1.2"
   },
   "require-dev": {
+    "carthage-software/mago": "^1.0.0-rc.12",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.2",
     "phpunit/phpunit": "^10.0",
     "roave/security-advisories": "dev-latest",
@@ -40,6 +41,7 @@
   },
   "config": {
     "allow-plugins": {
+      "carthage-software/mago": true,
       "dealerdirect/phpcodesniffer-composer-installer": true
     },
     "notify-on-install": false,
