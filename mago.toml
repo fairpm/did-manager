@@ -8,16 +8,17 @@ includes = ["vendor"]
 excludes = []
 
 [formatter]
-inline-empty-function-braces = true
+always-break-named-arguments-list = false
 inline-empty-classlike-braces = true
-preserve-breaking-member-access-chain = true
+inline-empty-function-braces = true
+inline-empty-method-braces = true
+null-type-hint = "question"
 preserve-breaking-argument-list = true
 preserve-breaking-array-like = true
-preserve-breaking-parameter-list = true
 preserve-breaking-attribute-list = true
 preserve-breaking-conditional-expression = true
-break-promoted-properties-list = true
-always-break-named-arguments-list = false
+preserve-breaking-member-access-chain = true
+preserve-breaking-parameter-list = true
 
 [linter]
 integrations = ["symfony"]
