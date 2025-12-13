@@ -103,7 +103,7 @@ class PlcClientTest extends TestCase
         $client = new PlcClient('http://invalid.local.test', 1);
 
         $this->expectException(\RuntimeException::class);
-        $client->create_did(['type' => 'plc_operation']);
+        $client->create_did('did:plc:test123', ['type' => 'plc_operation']);
     }
 
     /**

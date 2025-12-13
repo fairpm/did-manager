@@ -16,6 +16,7 @@ use CBOR\MapObject;
 use CBOR\OtherObject\NullObject;
 use CBOR\TextStringObject;
 use Exception;
+use FAIR\DID\Crypto\CanonicalMapObject;
 use FAIR\DID\Keys\Key;
 use FAIR\DID\Keys\KeyFactory;
 use JsonSerializable;
@@ -172,23 +173,11 @@ class PlcOperation implements JsonSerializable
      * Create a canonical map from items.
      *
      * @param MapItem[] $items Items to add.
-     * @return MapObject Sorted map object.
+     * @return CanonicalMapObject Canonical sorted map object.
      */
-    private function create_sorted_map(array $items = []): MapObject
+    private function create_sorted_map(array $items = []): CanonicalMapObject
     {
-        $sorted = [];
-        foreach ($items as $item) {
-            $key = $item->getKey();
-            $key_string = $key instanceof TextStringObject ? $key->getValue() : (string) $key;
-            $sorted[$key_string] = $item;
-        }
-        ksort($sorted, SORT_STRING);
-
-        $map = MapObject::create();
-        foreach ($sorted as $item) {
-            $map->add($item->getKey(), $item->getValue());
-        }
-        return $map;
+        return CanonicalMapObject::create($items);
     }
 
     /**

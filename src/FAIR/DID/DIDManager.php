@@ -88,7 +88,7 @@ class DIDManager
 
         // Submit to PLC directory.
         try {
-            $this->plc_client->create_did((array) $signed_operation->jsonSerialize());
+            $this->plc_client->create_did($did, (array) $signed_operation->jsonSerialize());
         } catch (\RuntimeException $e) {
             throw new \RuntimeException('Failed to create DID on PLC directory: ' . $e->getMessage());
         }

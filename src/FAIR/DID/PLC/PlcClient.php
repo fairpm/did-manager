@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace FAIR\DID\PLC;
 
+use FAIR\DID\Crypto\DidCodec;
+
 /**
  * PlcClient - Bluesky PLC Directory API Client.
  */
@@ -30,27 +32,37 @@ class PlcClient
     private int $timeout;
 
     /**
+     * Whether to verify SSL certificates.
+     *
+     * @var bool
+     */
+    private bool $verify_ssl;
+
+    /**
      * Constructor.
      *
      * @param string $base_url PLC directory base URL.
      * @param int    $timeout HTTP timeout in seconds.
+     * @param bool   $verify_ssl Whether to verify SSL certificates (disable for local dev).
      */
-    public function __construct(string $base_url = 'https://plc.directory', int $timeout = 30)
+    public function __construct(string $base_url = 'https://plc.directory', int $timeout = 30, bool $verify_ssl = true)
     {
         $this->base_url = rtrim($base_url, '/');
         $this->timeout = $timeout;
+        $this->verify_ssl = $verify_ssl;
     }
 
     /**
      * Create a new DID.
      *
-     * @param array $signed_operation The signed PLC operation.
+     * @param string $did The DID identifier.
+     * @param array  $signed_operation The signed PLC operation as array.
      * @return array Response from PLC.
      * @throws \RuntimeException On network or API error.
      */
-    public function create_did(array $signed_operation): array
+    public function create_did(string $did, array $signed_operation): array
     {
-        return $this->post('/', $signed_operation);
+        return $this->post("/{$did}", $signed_operation);
     }
 
     /**
@@ -136,6 +148,8 @@ class PlcClient
                     'Accept: application/json',
                 ],
                 CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_SSL_VERIFYPEER => $this->verify_ssl,
+                CURLOPT_SSL_VERIFYHOST => $this->verify_ssl ? 2 : 0,
             ],
         );
 
@@ -187,6 +201,8 @@ class PlcClient
                     'Accept: application/json',
                 ],
                 CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_SSL_VERIFYPEER => $this->verify_ssl,
+                CURLOPT_SSL_VERIFYHOST => $this->verify_ssl ? 2 : 0,
             ],
         );
 
@@ -203,8 +219,8 @@ class PlcClient
             $this->handle_error($http_code, $response);
         }
 
-        // Some endpoints return empty 200/201 responses.
-        if (empty($response)) {
+        // Some endpoints return empty 200/201 responses or plain text like "OK"
+        if (empty($response) || trim($response) === 'OK') {
             return [
                 'success' => true,
                 'http_code' => $http_code,
@@ -213,6 +229,14 @@ class PlcClient
 
         $decoded = json_decode($response, true);
         if (null === $decoded && JSON_ERROR_NONE !== json_last_error()) {
+            // If it's not valid JSON but request was successful, treat as success
+            if ($http_code >= 200 && $http_code < 300) {
+                return [
+                    'success' => true,
+                    'http_code' => $http_code,
+                    'message' => $response,
+                ];
+            }
             throw new \RuntimeException('Invalid JSON response: ' . json_last_error_msg());
         }
 
