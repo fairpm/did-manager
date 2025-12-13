@@ -81,6 +81,25 @@ try {
         echo "Note: Unable to resolve from live directory (expected in local dev): {$e->getMessage()}\n\n";
     }
 
+    // Update the DID with a service endpoint.
+    echo "3. Updating DID with service endpoint...\n";
+    
+    $service = [
+        'id' => '#fairpm_repo',
+        'type' => 'FairPackageManagementRepo',
+        'serviceEndpoint' => "https://fair.git-updater.com/wp-json/fair-beacon/v1/packages/{$result['did']}",
+    ];
+    
+    // Note: DIDManager currently supports 'handle' and 'service' changes
+    // For custom services like FairPackageManagementRepo, we need to use the low-level API
+    // This example shows the intended usage pattern
+    
+    echo "Note: Custom service endpoints require using the low-level API (see Method 2)\n";
+    echo "Service to add:\n";
+    echo "  ID: {$service['id']}\n";
+    echo "  Type: {$service['type']}\n";
+    echo "  Endpoint: {$service['serviceEndpoint']}\n\n";
+
 } catch (\Exception $e) {
     echo "Note: {$e->getMessage()}\n";
     echo "(This is expected in local development environments)\n\n";
@@ -173,6 +192,66 @@ try {
         echo "✓ And the operation was properly signed and ready for submission\n\n";
     }
 
+    // Step 7: Update the DID with a service endpoint.
+    echo "Step 7: Updating DID with Service Endpoint\n";
+    echo str_repeat('-', 50) . "\n";
+    
+    try {
+        // For updates with custom services, we need to create PlcOperation directly
+        // Services are structured as an associative array: key => ['type' => ..., 'endpoint' => ...]
+        $services = [
+            'fairpm_repo' => [
+                'type' => 'FairPackageManagementRepo',
+                'endpoint' => "https://fair.git-updater.com/wp-json/fair-beacon/v1/packages/{$did}",
+            ],
+        ];
+        
+        // Generate a unique ID for the verification key (same as original)
+        $key_id = substr(hash('sha256', $verification_key->encode_public()), 0, 6);
+        
+        $update_operation = new \FAIR\DID\PLC\PlcOperation(
+            type: 'plc_operation',
+            rotation_keys: [$rotation_key],
+            verification_methods: ['fair_' . $key_id => $verification_key],
+            also_known_as: ['at://' . $handle],
+            services: $services,
+            prev: $signed_operation->get_cid()  // Previous operation CID
+        );
+        
+        // Sign the update operation.
+        $signed_update = DidCodec::sign_plc_operation($update_operation, $rotation_key);
+        
+        echo "✓ Update Operation Created and Signed\n";
+        echo "  Previous CID: {$signed_operation->get_cid()}\n";
+        echo "  Service: FairPackageManagementRepo\n\n";
+        
+        // Submit update.
+        $plc_client = new PlcClient('https://plc.directory', 30, false);
+        $update_response = $plc_client->update_did($did, (array) $signed_update->jsonSerialize());
+        
+        echo "✓ DID Updated Successfully!\n";
+        echo "  Response: " . json_encode($update_response) . "\n\n";
+        
+        // Verify the update.
+        echo "Step 8: Verifying Update\n";
+        echo str_repeat('-', 50) . "\n";
+        
+        $resolved_updated = $plc_client->resolve_did($did);
+        echo "✓ Updated DID Verified!\n";
+        echo "  Services: " . count($resolved_updated['service']) . "\n";
+        if (!empty($resolved_updated['service'])) {
+            foreach ($resolved_updated['service'] as $svc) {
+                echo "    - {$svc['id']}: {$svc['type']}\n";
+                echo "      Endpoint: {$svc['serviceEndpoint']}\n";
+            }
+        }
+        echo "\n";
+        
+    } catch (\Exception $e) {
+        echo "Note: Unable to update DID: " . substr($e->getMessage(), 0, 60) . "...\n";
+        echo "(This is expected in local development environments)\n\n";
+    }
+
 } catch (\Exception $e) {
     echo "✗ Error in manual process: {$e->getMessage()}\n";
     echo "  Stack trace:\n";
@@ -230,6 +309,21 @@ try {
     if (file_exists($plugin_path)) {
         unlink($plugin_path);
     }
+
+    // Update the DID with a service endpoint.
+    echo "Updating plugin DID with service endpoint...\n";
+    
+    $service = [
+        'id' => '#fairpm_repo',
+        'type' => 'FairPackageManagementRepo',
+        'serviceEndpoint' => "https://fair.git-updater.com/wp-json/fair-beacon/v1/packages/{$result['did']}",
+    ];
+    
+    echo "Note: Custom service endpoints require using the low-level API (see Method 2)\n";
+    echo "Service to add:\n";
+    echo "  ID: {$service['id']}\n";
+    echo "  Type: {$service['type']}\n";
+    echo "  Endpoint: {$service['serviceEndpoint']}\n\n";
 
 } catch (\Exception $e) {
     echo "Note: {$e->getMessage()}\n";
