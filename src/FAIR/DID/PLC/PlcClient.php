@@ -127,6 +127,36 @@ class PlcClient
     }
 
     /**
+     * Get the previous CID for a DID.
+     *
+     * This fetches the audit log and returns the CID of the most recent valid operation,
+     * which should be used as the `prev` field when creating an update operation.
+     *
+     * According to the PLC spec: "if the most recent valid DID operation CID (hash) isn't known,
+     * fetch the audit log from https://plc.directory/:did/log/audit, identify the most recent
+     * valid operation, and get the cid value."
+     *
+     * @param string $did The DID to get the previous CID for.
+     * @return string|null The CID of the most recent operation, or null if no operations exist.
+     * @throws \RuntimeException On network or API error.
+     */
+    public function get_previous_cid(string $did): ?string
+    {
+        $audit_log = $this->get_audit_log($did);
+
+        if (empty($audit_log)) {
+            return null;
+        }
+
+        // The audit log is an array of operations, sorted chronologically
+        // The most recent operation is the last one in the array
+        $most_recent_operation = end($audit_log);
+
+        // Each operation in the audit log has a 'cid' field
+        return $most_recent_operation['cid'] ?? null;
+    }
+
+    /**
      * Perform a GET request.
      *
      * @param string $endpoint API endpoint.

@@ -197,6 +197,12 @@ try {
     echo str_repeat('-', 50) . "\n";
     
     try {
+        // First, get the previous CID from the PLC directory
+        // This is the real-world approach - fetching the current state before updating
+        echo "Fetching previous CID from PLC directory...\n";
+        $previous_cid = $plc_client->get_previous_cid($did);
+        echo "✓ Previous CID Retrieved: {$previous_cid}\n\n";
+        
         // For updates with custom services, we need to create PlcOperation directly
         // Services are structured as an associative array: key => ['type' => ..., 'endpoint' => ...]
         $services = [
@@ -215,14 +221,14 @@ try {
             verification_methods: ['fair_' . $key_id => $verification_key],
             also_known_as: ['at://' . $handle],
             services: $services,
-            prev: $signed_operation->get_cid()  // Previous operation CID
+            prev: $previous_cid  // Use the CID fetched from PLC directory
         );
         
         // Sign the update operation.
         $signed_update = DidCodec::sign_plc_operation($update_operation, $rotation_key);
         
         echo "✓ Update Operation Created and Signed\n";
-        echo "  Previous CID: {$signed_operation->get_cid()}\n";
+        echo "  Previous CID: {$previous_cid}\n";
         echo "  Service: FairPackageManagementRepo\n\n";
         
         // Submit update.
