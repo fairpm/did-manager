@@ -108,10 +108,16 @@ class MetadataGenerator
     public function generate(): array
     {
         $metadata = [
-            '$schema' => 'https://fair-protocol.org/schemas/wordpress-plugin.json',
-            'schemaVersion' => '1.0',
-            'type' => $this->type ?? $this->detect_type(),
+            '@context' => 'https://www.w3.org/ns/activitystreams',
         ];
+
+        // ID (DID).
+        if (null !== $this->did) {
+            $metadata['id'] = $this->did;
+        }
+
+        // Type.
+        $metadata['type'] = $this->type ?? $this->detect_type();
 
         // Slug.
         $metadata['slug'] = $this->get_slug();
@@ -137,10 +143,10 @@ class MetadataGenerator
             $metadata['homepage'] = $homepage;
         }
 
-        // Author.
-        $author = $this->get_author();
-        if ($author) {
-            $metadata['author'] = $author;
+        // Authors.
+        $authors = $this->get_authors();
+        if ($authors) {
+            $metadata['authors'] = $authors;
         }
 
         // License.
@@ -161,26 +167,9 @@ class MetadataGenerator
             $metadata['tags'] = $tags;
         }
 
-        // DID.
-        if (null !== $this->did) {
-            $metadata['did'] = $this->did;
-        }
-
-        // Readme data.
-        if (!empty($this->readme_data)) {
-            $readme = [];
-
-            if (!empty($this->readme_data['header'])) {
-                $readme['header'] = $this->readme_data['header'];
-            }
-
-            if (!empty($this->readme_data['sections'])) {
-                $readme['sections'] = $this->readme_data['sections'];
-            }
-
-            if (!empty($readme)) {
-                $metadata['readme'] = $readme;
-            }
+        // Sections from readme.
+        if (!empty($this->readme_data['sections'])) {
+            $metadata['sections'] = $this->readme_data['sections'];
         }
 
         // Generated timestamp.
@@ -331,28 +320,35 @@ class MetadataGenerator
     }
 
     /**
-     * Get author information.
+     * Get authors information.
      *
-     * @return array|null Author info.
+     * @return array|null Array of author objects.
      */
-    private function get_author(): ?array
+    private function get_authors(): ?array
     {
-        $author = [];
+        $authors = [];
 
+        // Primary author from header.
         if (!empty($this->header_data['author'])) {
-            $author['name'] = $this->header_data['author'];
-        }
-
-        if (!empty($this->header_data['author_uri'])) {
-            $author['url'] = $this->header_data['author_uri'];
+            $primary_author = [
+                'name' => $this->header_data['author'],
+            ];
+            
+            if (!empty($this->header_data['author_uri'])) {
+                $primary_author['url'] = $this->header_data['author_uri'];
+            }
+            
+            $authors[] = $primary_author;
         }
 
         // Contributors from readme.
         if (!empty($this->readme_data['header']['contributors'])) {
-            $author['contributors'] = $this->readme_data['header']['contributors'];
+            foreach ($this->readme_data['header']['contributors'] as $contributor) {
+                $authors[] = ['name' => $contributor];
+            }
         }
 
-        return !empty($author) ? $author : null;
+        return !empty($authors) ? $authors : null;
     }
 
     /**

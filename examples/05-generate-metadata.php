@@ -114,7 +114,7 @@ echo str_repeat( '-', 50 ) . "\n";
 $generator = new MetadataGenerator( $header_data, $readme_data );
 $metadata  = $generator->generate();
 
-echo 'Schema Version: ' . $metadata['schemaVersion'] . "\n";
+echo '@context: ' . $metadata['@context'] . "\n";
 echo 'Type: ' . $metadata['type'] . "\n";
 echo 'Slug: ' . $metadata['slug'] . "\n";
 echo 'Name: ' . $metadata['name'] . "\n";
@@ -129,7 +129,7 @@ echo str_repeat( '-', 50 ) . "\n";
 $generator->set_did( 'did:plc:contactformpro123' );
 $metadata_with_did = $generator->generate();
 
-echo 'DID: ' . $metadata_with_did['did'] . "\n\n";
+echo 'ID (DID): ' . $metadata_with_did['id'] . "\n\n";
 
 // -----------------------------------------------------------------------------
 // 4. Override slug
@@ -168,16 +168,18 @@ foreach ( array_keys( $full_metadata ) as $key ) {
 echo "\n";
 
 // -----------------------------------------------------------------------------
-// 6. Author information
+// 6. Authors information
 // -----------------------------------------------------------------------------
-echo "6. Author Information\n";
+echo "6. Authors Information\n";
 echo str_repeat( '-', 50 ) . "\n";
 
-$author = $full_metadata['author'];
-echo 'Author Name: ' . ( $author['name'] ?? 'N/A' ) . "\n";
-echo 'Author URI: ' . ( $author['uri'] ?? 'N/A' ) . "\n";
-if ( isset( $author['contributors'] ) ) {
-	echo 'Contributors: ' . implode( ', ', $author['contributors'] ) . "\n";
+$authors = $full_metadata['authors'];
+echo 'Primary Author: ' . ( $authors[0]['name'] ?? 'N/A' ) . "\n";
+echo 'Author URL: ' . ( $authors[0]['url'] ?? 'N/A' ) . "\n";
+if ( count( $authors ) > 1 ) {
+	$contributors = array_slice( $authors, 1 );
+	echo 'Additional Authors: ';
+	echo implode( ', ', array_column( $contributors, 'name' ) ) . "\n";
 }
 echo "\n";
 
@@ -201,13 +203,13 @@ echo str_repeat( '-', 50 ) . "\n";
 echo 'Tags: ' . implode( ', ', $full_metadata['tags'] ) . "\n\n";
 
 // -----------------------------------------------------------------------------
-// 9. Readme sections
+// 9. Sections from readme
 // -----------------------------------------------------------------------------
-echo "9. Readme Sections\n";
+echo "9. Sections from Readme\n";
 echo str_repeat( '-', 50 ) . "\n";
 
-if ( isset( $full_metadata['readme']['sections'] ) ) {
-	foreach ( array_keys( $full_metadata['readme']['sections'] ) as $section ) {
+if ( isset( $full_metadata['sections'] ) ) {
+	foreach ( array_keys( $full_metadata['sections'] ) as $section ) {
 		echo "  - {$section}\n";
 	}
 }

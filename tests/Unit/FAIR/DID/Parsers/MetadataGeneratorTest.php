@@ -63,25 +63,7 @@ class MetadataGeneratorTest extends TestCase
         ];
     }
 
-    /**
-     * Test schema exists
-     */
-    public function testSchemaExists(): void
-    {
-        $generator = new MetadataGenerator($this->getHeaderData(), $this->getReadmeData());
-        $metadata = $generator->generate();
-        $this->assertArrayHasKey('$schema', $metadata);
-    }
 
-    /**
-     * Test schemaVersion exists
-     */
-    public function testSchemaVersionExists(): void
-    {
-        $generator = new MetadataGenerator($this->getHeaderData(), $this->getReadmeData());
-        $metadata = $generator->generate();
-        $this->assertArrayHasKey('schemaVersion', $metadata);
-    }
 
     /**
      * Test type is plugin
@@ -131,7 +113,7 @@ class MetadataGeneratorTest extends TestCase
         $generator = new MetadataGenerator($this->getHeaderData(), $this->getReadmeData());
         $generator->set_did('did:plc:abc123');
         $metadata = $generator->generate();
-        $this->assertSame('did:plc:abc123', $metadata['did']);
+        $this->assertSame('did:plc:abc123', $metadata['id']);
     }
 
     /**
@@ -145,23 +127,27 @@ class MetadataGeneratorTest extends TestCase
     }
 
     /**
-     * Test author name from header
+     * Test authors array from header
      */
-    public function testAuthorNameFromHeader(): void
+    public function testAuthorsArrayFromHeader(): void
     {
         $generator = new MetadataGenerator($this->getHeaderData(), $this->getReadmeData());
         $metadata = $generator->generate();
-        $this->assertSame('Test Author', $metadata['author']['name']);
+        $this->assertIsArray($metadata['authors']);
+        $this->assertSame('Test Author', $metadata['authors'][0]['name']);
+        $this->assertSame('https://example.com', $metadata['authors'][0]['url']);
     }
 
     /**
-     * Test contributors from readme
+     * Test contributors from readme included in authors
      */
-    public function testContributorsFromReadme(): void
+    public function testContributorsFromReadmeInAuthors(): void
     {
         $generator = new MetadataGenerator($this->getHeaderData(), $this->getReadmeData());
         $metadata = $generator->generate();
-        $this->assertArrayHasKey('contributors', $metadata['author']);
+        $this->assertGreaterThanOrEqual(3, count($metadata['authors']));
+        $this->assertSame('author1', $metadata['authors'][1]['name']);
+        $this->assertSame('author2', $metadata['authors'][2]['name']);
     }
 
     /**
@@ -197,13 +183,13 @@ class MetadataGeneratorTest extends TestCase
     }
 
     /**
-     * Test readme sections included
+     * Test sections included at root level
      */
-    public function testReadmeSectionsIncluded(): void
+    public function testSectionsIncludedAtRoot(): void
     {
         $generator = new MetadataGenerator($this->getHeaderData(), $this->getReadmeData());
         $metadata = $generator->generate();
-        $this->assertArrayHasKey('sections', $metadata['readme']);
+        $this->assertArrayHasKey('sections', $metadata);
     }
 
     /**
