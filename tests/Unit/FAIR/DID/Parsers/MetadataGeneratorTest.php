@@ -246,4 +246,20 @@ class MetadataGeneratorTest extends TestCase
         $metadata = $generator->generate();
         $this->assertSame('theme', $metadata['type']);
     }
+
+    /**
+     * Test security field from header
+     */
+    public function testSecurityFieldFromHeader(): void
+    {
+        $header_with_security = array_merge(
+            $this->getHeaderData(),
+            ['security' => 'security@example.com']
+        );
+        $generator = new MetadataGenerator($header_with_security, $this->getReadmeData());
+        $metadata = $generator->generate();
+        $this->assertArrayHasKey('security', $metadata);
+        $this->assertIsArray($metadata['security']);
+        $this->assertSame('security@example.com', $metadata['security'][0]['email']);
+    }
 }

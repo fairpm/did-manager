@@ -37,6 +37,7 @@ class PluginHeaderParser
         'License URI',
         'Update URI',
         'Tags',
+        'Security',
     ];
 
     /**

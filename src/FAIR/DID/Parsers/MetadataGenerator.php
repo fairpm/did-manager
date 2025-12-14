@@ -167,6 +167,12 @@ class MetadataGenerator
             $metadata['tags'] = $tags;
         }
 
+        // Security contact.
+        $security = $this->get_security();
+        if ($security) {
+            $metadata['security'] = $security;
+        }
+
         // Sections from readme.
         if (!empty($this->readme_data['sections'])) {
             $metadata['sections'] = $this->readme_data['sections'];
@@ -431,6 +437,26 @@ class MetadataGenerator
         $tags = array_values($tags);
 
         return !empty($tags) ? $tags : null;
+    }
+
+    /**
+     * Get security contact information.
+     *
+     * @return array|null Array of security contact objects.
+     */
+    private function get_security(): ?array
+    {
+        $security = [];
+
+        // Security email from header.
+        if (!empty($this->header_data['security'])) {
+            $email = trim($this->header_data['security']);
+            if (!empty($email)) {
+                $security[] = ['email' => $email];
+            }
+        }
+
+        return !empty($security) ? $security : null;
     }
 
     /**

@@ -36,6 +36,7 @@ $plugin_header = <<<'PHP'
  * Requires PHP: 8.1
  * License: GPL-2.0+
  * Tags: forms, contact, email
+ * Security: security@formbuilder.io
  */
 PHP;
 
