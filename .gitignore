@@ -1,26 +1,41 @@
-# Ignore most hidden files and directories by default
+#### ignore all dotfiles and dot-dirs, with exceptions
 .*
+!.config/
+!.distignore
+!.dockerignore
+!.editorconfig
+!.env.example
+!.gitattributes
 !.gitignore
 
-# Directory patterns (none yet)
+#### ignore these patterns
+*.bak
+*.log
+*.tmp
+*.local
+*.local.*
+*.secret
+*.secret.*
 
-# Directory names
-node_modules/
-out/
+#### ignore these specific directories
 tmp/
 vendor/
 
-# File patterns
-*.bak
-*.iml
-*.log
-*.secret
-*.secret.*
-*.tmp
-.env
-.env.*
-
-# File names
-.phpstorm.meta.php
-.pre-commit-config.yaml
+#### ignore these specific files
+auth.json
 docker-compose.override.yml
+
+# Local key storage (contains private keys - never commit!)
+*.keys.json
+fair-keys.json
+.fair-keys.json
+
+# misc
+*.cache
+*.sublime-project
+*.sublime-workspace
+*.swo
+*.swp
+*~
+Thumbs.db
+desktop.ini

@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<ruleset name="FAIR CLI WordPress Coding Standards">
+	<description>A custom set of rules to check for the FAIR CLI project based on WordPress Coding Standards.</description>
+
+	<!-- What to scan -->
+	<file>./src</file>
+	<file>./tests</file>
+
+	<!-- Exclude vendor directory -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+
+	<!-- Show progress and sniff codes in all reports -->
+	<arg value="ps"/>
+	<arg name="colors"/>
+
+	<!-- Set default encoding -->
+	<arg name="encoding" value="utf-8"/>
+
+	<!-- Check for cross-platform compatibility -->
+	<config name="testVersion" value="8.0-"/>
+
+	<!-- Use WordPress Coding Standards -->
+	<rule ref="WordPress">
+		<!-- Allow short array syntax -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+
+		<!-- Allow PSR-4 style namespaces in tests -->
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+
+		<!-- We use class-name.php naming which is WP style -->
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+
+		<!-- Allow short ternary -->
+		<exclude name="Universal.Operators.DisallowShortTernary"/>
+
+		<!-- CLI tool doesn't need text domain -->
+		<exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
+		<exclude name="WordPress.WP.I18n.NonSingularStringLiteralText"/>
+
+		<!-- Not a WordPress plugin, so no escaping needed for CLI output -->
+		<exclude name="WordPress.Security.EscapeOutput"/>
+
+		<!-- Allow direct database queries for our custom client -->
+		<exclude name="WordPress.DB.DirectDatabaseQuery"/>
+
+		<!-- Not using WordPress nonces in CLI tool -->
+		<exclude name="WordPress.Security.NonceVerification"/>
+
+		<!-- Allow file operations in CLI tool -->
+		<exclude name="WordPress.WP.AlternativeFunctions"/>
+
+		<!-- Allow error silencing where appropriate -->
+		<exclude name="WordPress.PHP.NoSilencedErrors"/>
+	</rule>
+
+	<!-- Use WordPress-Extra for additional checks -->
+	<rule ref="WordPress-Extra">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+	</rule>
+
+	<!-- Use WordPress-Docs for documentation standards -->
+	<rule ref="WordPress-Docs"/>
+
+	<!-- Verify that everything is properly documented -->
+	<rule ref="Squiz.Commenting.FunctionComment">
+		<exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
+		<exclude name="Squiz.Commenting.FunctionComment.ThrowsNoFullStop"/>
+	</rule>
+
+	<!-- PHPUnit test methods don't need doc blocks -->
+	<rule ref="Squiz.Commenting.FunctionComment.Missing">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Allow test methods without comments -->
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Tests can have longer lines for readability -->
+	<rule ref="Generic.Files.LineLength">
+		<properties>
+			<property name="lineLimit" value="120"/>
+			<property name="absoluteLineLimit" value="200"/>
+		</properties>
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+</ruleset>
