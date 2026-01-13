@@ -16,6 +16,9 @@ use FAIR\DID\Parsers\ReadmeParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Check if full output is requested (pass --full as argument or set FULL_OUTPUT env var)
+$full_output = in_array('--full', $argv) || getenv('FULL_OUTPUT') === '1';
+
 echo "=== FAIR CLI: Metadata Generation Examples ===\n\n";
 
 // -----------------------------------------------------------------------------
@@ -223,10 +226,17 @@ echo "10. JSON Output (formatted)\n";
 echo str_repeat( '-', 50 ) . "\n";
 
 $json_output = json_encode( $full_metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
-// Show first 1000 chars.
-echo substr( $json_output, 0, 1000 );
-if ( strlen( $json_output ) > 1000 ) {
-	echo "\n... (truncated, full output is " . strlen( $json_output ) . " chars)\n";
+
+if ( $full_output ) {
+	// Show complete output
+	echo $json_output;
+} else {
+	// Show first 1000 chars.
+	echo substr( $json_output, 0, 1000 );
+	if ( strlen( $json_output ) > 1000 ) {
+		echo "\n... (truncated, full output is " . strlen( $json_output ) . " chars)\n";
+		echo "\nTip: Use '--full' flag to see complete output: php " . basename(__FILE__) . " --full\n";
+	}
 }
 echo "\n\n";
 

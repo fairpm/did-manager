@@ -239,8 +239,8 @@ class ReadmeParserTest extends TestCase
     public function testTwoFaqEntriesFound(): void
     {
         $result = $this->parser->parse_content($this->get_full_readme());
-        $faq = $result['sections']['faq'] ?? '';
-        $parsed_faq = $this->parser->parse_faq($faq);
+        // Use the get_faq() method which returns the parser's FAQ data
+        $parsed_faq = $this->parser->get_faq();
         $this->assertCount(2, $parsed_faq);
     }
 
@@ -250,9 +250,11 @@ class ReadmeParserTest extends TestCase
     public function testFaqQuestionParsed(): void
     {
         $result = $this->parser->parse_content($this->get_full_readme());
-        $faq = $result['sections']['faq'] ?? '';
-        $parsed_faq = $this->parser->parse_faq($faq);
-        $this->assertStringContainsString('How do I use', $parsed_faq[0]['question']);
+        // Use the get_faq() method - returns question => answer pairs
+        $parsed_faq = $this->parser->get_faq();
+        $questions = array_keys($parsed_faq);
+        $this->assertNotEmpty($questions);
+        $this->assertStringContainsString('How do I use', $questions[0]);
     }
 
     /**
