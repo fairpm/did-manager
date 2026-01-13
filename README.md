@@ -254,7 +254,7 @@ composer lint:fix
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+GPL-3.0-or-later - see [LICENSE](LICENSE) for details.
 
 ## Contributing
 
@@ -269,3 +269,27 @@ MIT License - see [LICENSE](LICENSE) for details.
 - [FAIR Protocol Specification](https://fair-protocol.org)
 - [AT Protocol](https://atproto.com)
 - [DID:PLC Method](https://github.com/did-method-plc/did-method-plc)
+
+## Attributions
+
+This project uses the following open-source libraries:
+
+### Runtime Dependencies
+
+| Library | License | Description |
+|---------|---------|-------------|
+| [afragen/wordpress-plugin-readme-parser](https://github.com/afragen/wordpress-plugin-readme-parser) | GPL-3.0-or-later | Based on WordPress.org Plugin Directory readme parser |
+| [simplito/elliptic-php](https://github.com/simplito/elliptic-php) | MIT | Elliptic curve cryptography for secp256k1 signatures |
+| [spomky-labs/cbor-php](https://github.com/Spomky-Labs/cbor-php) | MIT | CBOR encoder/decoder for DAG-CBOR operations |
+| [yocto/yoclib-multibase](https://packagist.org/packages/yocto/yoclib-multibase) | GPL-3.0-or-later | Multibase encoding implementation |
+
+### Transitive Dependencies
+
+| Library | License | Description |
+|---------|---------|-------------|
+| [erusev/parsedown](https://github.com/erusev/Parsedown) | MIT | Markdown parser (required by wordpress-plugin-readme-parser) |
+| [simplito/bigint-wrapper-php](https://github.com/simplito/bigint-wrapper-php) | MIT | BigInt wrapper (required by elliptic-php) |
+| [simplito/bn-php](https://github.com/simplito/bn-php) | MIT | Big number library (required by elliptic-php) |
+| [brick/math](https://github.com/brick/math) | MIT | Arbitrary-precision arithmetic (required by cbor-php) |
+
+All dependencies are used in compliance with their respective licenses.
