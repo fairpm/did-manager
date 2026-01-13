@@ -2,6 +2,8 @@
   "name": "fairpm/did-manager",
   "description": "FAIR PHP CLI Tool for DID Management and WordPress Plugin/Theme Metadata Generation",
   "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "authors": [
     {
       "name": "FAIRPM",
@@ -10,6 +12,7 @@
   ],
   "require": {
     "php": ">=8.3",
+    "afragen/wordpress-plugin-readme-parser": "^1.2025.12",
     "ext-curl": "*",
     "ext-json": "*",
     "simplito/elliptic-php": "^1.0",

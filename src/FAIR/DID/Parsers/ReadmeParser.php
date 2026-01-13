@@ -3,7 +3,7 @@
 /**
  * ReadmeParser - WordPress readme.txt parsing
  *
- * Parses WordPress.org style readme.txt files.
+ * Wraps the WordPress.org Plugin Directory readme parser from afragen/wordpress-plugin-readme-parser.
  *
  * @package FairDidManager\Parsers
  */
@@ -12,40 +12,25 @@ declare(strict_types=1);
 
 namespace FAIR\DID\Parsers;
 
+// Include WordPress function stubs for standalone usage
+require_once __DIR__ . '/wordpress-stubs.php';
+
+use WordPressdotorg\Plugin_Directory\Readme\Parser;
+
 /**
  * ReadmeParser - WordPress readme.txt parsing.
+ *
+ * This class wraps the official WordPress.org Plugin Directory readme parser
+ * and provides a consistent interface for parsing WordPress readme.txt files.
  */
 class ReadmeParser
 {
     /**
-     * Standard readme header fields
+     * The underlying WordPress.org parser instance.
+     *
+     * @var Parser|null
      */
-    private const HEADER_FIELDS = [
-        'Contributors',
-        'Tags',
-        'Requires at least',
-        'Tested up to',
-        'Requires PHP',
-        'Stable tag',
-        'License',
-        'License URI',
-        'Donate link',
-    ];
-
-    /**
-     * Standard section names
-     */
-    private const SECTIONS = [
-        'Description',
-        'Installation',
-        'FAQ',
-        'Frequently Asked Questions',
-        'Screenshots',
-        'Changelog',
-        'Upgrade Notice',
-        'Other Notes',
-        'Arbitrary section',
-    ];
+    private ?Parser $parser = null;
 
     /**
      * Parse readme.txt from a directory.
@@ -75,12 +60,10 @@ class ReadmeParser
             return [];
         }
 
-        $content = file_get_contents($file_path);
-        if (false === $content) {
-            return [];
-        }
+        // The WordPress.org parser accepts a file path directly
+        $this->parser = new Parser($file_path);
 
-        return $this->parse_content($content);
+        return $this->normalize_parser_output();
     }
 
     /**
@@ -91,86 +74,87 @@ class ReadmeParser
      */
     public function parse_content(string $content): array
     {
-        // Normalize line endings.
-        $content = str_replace(["\r\n", "\r"], "\n", $content);
+        if (empty(trim($content))) {
+            return [
+                'name' => null,
+                'header' => [],
+                'short_description' => null,
+                'sections' => [],
+            ];
+        }
+
+        // The WordPress.org parser accepts content directly if it contains newlines
+        $this->parser = new Parser($content);
+
+        return $this->normalize_parser_output();
+    }
+
+    /**
+     * Normalize the WordPress.org parser output to our expected format.
+     *
+     * @return array Normalized data.
+     */
+    private function normalize_parser_output(): array
+    {
+        if (null === $this->parser) {
+            return [
+                'name' => null,
+                'header' => [],
+                'short_description' => null,
+                'sections' => [],
+            ];
+        }
 
         $result = [
-            'name' => null,
+            'name' => $this->parser->name ?: null,
             'header' => [],
-            'short_description' => null,
+            'short_description' => $this->parser->short_description ?: null,
             'sections' => [],
         ];
 
-        $lines = explode("\n", $content);
-        $current_section = null;
-        $section_content = [];
-        $in_header = true;
-        $found_first_section = false;
-        $short_desc_lines = [];
-
-        foreach ($lines as $line_num => $line) {
-            $trimmed_line = trim($line);
-
-            // Parse plugin/theme name from first line === Name ===.
-            if (null === $result['name'] && preg_match('/^===\s*(.+?)\s*===\s*$/', $trimmed_line, $matches)) {
-                $result['name'] = $matches[1];
-                continue;
-            }
-
-            // Check for section header == Section Name ==.
-            if (preg_match('/^==\s*(.+?)\s*==\s*$/', $trimmed_line, $matches)) {
-                // Save previous section if exists.
-                if (null !== $current_section) {
-                    $result['sections'][$current_section] = $this->process_section($section_content);
-                }
-
-                $current_section = $this->normalize_key($matches[1]);
-                $section_content = [];
-                $in_header = false;
-                $found_first_section = true;
-                continue;
-            }
-
-            // Parse header fields (before first section).
-            if ($in_header && !$found_first_section) {
-                if (preg_match('/^([^:]+):\s*(.*)$/', $trimmed_line, $matches)) {
-                    $key = trim($matches[1]);
-                    $value = trim($matches[2]);
-
-                    foreach (self::HEADER_FIELDS as $field) {
-                        if (0 === strcasecmp($key, $field)) {
-                            $normalized_key = $this->normalize_key($field);
-                            $result['header'][$normalized_key] = $this->parse_header_value($field, $value);
-                            break;
-                        }
-                    }
-                } elseif (null !== $result['name'] && '' !== $trimmed_line && !$found_first_section) {
-                    // Lines after header but before first section are short description.
-                    $short_desc_lines[] = $trimmed_line;
-                }
-            } elseif (null !== $current_section) {
-                // Accumulate section content.
-                $section_content[] = $line;
-            }
+        // Map header fields
+        if (!empty($this->parser->contributors)) {
+            $result['header']['contributors'] = $this->parser->contributors;
         }
 
-        // Save last section.
-        if (null !== $current_section) {
-            $result['sections'][$current_section] = $this->process_section($section_content);
+        if (!empty($this->parser->tags)) {
+            $result['header']['tags'] = $this->parser->tags;
         }
 
-        // Set short description.
-        if (!empty($short_desc_lines)) {
-            $result['short_description'] = implode(' ', $short_desc_lines);
-            // Limit to first ~150 characters as per WordPress.org spec.
-            $desc_length = strlen($result['short_description']);
-            if ($desc_length > 150) {
-                $result['short_description'] = substr($result['short_description'], 0, 150);
-                // Try to cut at last word boundary.
-                $last_space = strrpos($result['short_description'], ' ');
-                if (false !== $last_space && $last_space > 100) {
-                    $result['short_description'] = substr($result['short_description'], 0, $last_space);
-                }
+        if (!empty($this->parser->requires)) {
+            $result['header']['requires_at_least'] = $this->parser->requires;
+        }
+
+        if (!empty($this->parser->tested)) {
+            $result['header']['tested_up_to'] = $this->parser->tested;
+        }
+
+        if (!empty($this->parser->requires_php)) {
+            $result['header']['requires_php'] = $this->parser->requires_php;
+        }
+
+        if (!empty($this->parser->stable_tag)) {
+            $result['header']['stable_tag'] = $this->parser->stable_tag;
+        }
+
+        if (!empty($this->parser->license)) {
+            $result['header']['license'] = $this->parser->license;
+        }
+
+        if (!empty($this->parser->license_uri)) {
+            $result['header']['license_uri'] = $this->parser->license_uri;
+        }
+
+        if (!empty($this->parser->donate_link)) {
+            $result['header']['donate_link'] = $this->parser->donate_link;
+        }
+
+        // Map sections - convert keys to lowercase with underscores
+        if (!empty($this->parser->sections)) {
+            foreach ($this->parser->sections as $name => $content) {
+                $normalized_name = $this->normalize_key($name);
+                // Strip HTML tags from section content for consistency
+                $result['sections'][$normalized_name] = strip_tags($content);
             }
         }
 
@@ -247,50 +231,6 @@ class ReadmeParser
     }
 
     /**
-     * Parse a header value.
-     *
-     * @param string $field Field name.
-     * @param string $value Raw value.
-     * @return mixed Parsed value.
-     */
-    private function parse_header_value(string $field, string $value): mixed
-    {
-        $lower = strtolower($field);
-
-        // Handle comma-separated fields.
-        if (in_array($lower, ['contributors', 'tags'], true)) {
-            $items = explode(',', $value);
-            return array_values(array_filter(array_map('trim', $items)));
-        }
-
-        // Handle version fields.
-        if (in_array($lower, ['requires at least', 'tested up to', 'requires php', 'stable tag'], true)) {
-            return ltrim(trim($value), 'vV');
-        }
-
-        return $value;
-    }
-
-    /**
-     * Process section content.
-     *
-     * @param array $lines Section lines.
-     * @return string Processed content.
-     */
-    private function process_section(array $lines): string
-    {
-        // Remove leading/trailing empty lines.
-        while (!empty($lines) && '' === trim($lines[0])) {
-            array_shift($lines);
-        }
-        while (!empty($lines) && '' === trim(end($lines))) {
-            array_pop($lines);
-        }
-
-        return implode("\n", $lines);
-    }
-
-    /**
      * Parse changelog section into structured entries.
      *
      * @param string $changelog Raw changelog content.
@@ -306,8 +246,8 @@ class ReadmeParser
         foreach ($lines as $line) {
             $trimmed = trim($line);
 
-            // Match version header: = 1.0.0 = or = 1.0.0 - 2024-01-01 =.
-            if (preg_match('/^=\s*([\d.]+(?:\s*-\s*[\d-]+)?)\s*=/', $trimmed, $matches)) {
+            // Match version header: = 1.0.0 = or = 1.0.0 - 2024-01-01 = or just version numbers
+            if (preg_match('/^=?\s*([\d.]+(?:\s*-\s*[\d-]+)?)\s*=?/', $trimmed, $matches)) {
                 // Save previous version.
                 if (null !== $current_version) {
                     $entries[$current_version] = $current_changes;
@@ -352,7 +292,7 @@ class ReadmeParser
         foreach ($lines as $line) {
             $trimmed = trim($line);
 
-            // Match question: = Question here =.
+            // Match question: = Question here = or just text followed by content
             if (preg_match('/^=\s*(.+?)\s*=\s*$/', $trimmed, $matches)) {
                 // Save previous Q&A.
                 if (null !== $current_question) {
@@ -394,5 +334,73 @@ class ReadmeParser
 
         $parsed = $this->parse_file($readme);
         return !empty($parsed['name']) || !empty($parsed['header']);
+    }
+
+    /**
+     * Get the underlying parser instance.
+     *
+     * Useful for accessing additional properties not exposed through the normalized interface.
+     *
+     * @return Parser|null The parser instance or null if not yet parsed.
+     */
+    public function get_parser(): ?Parser
+    {
+        return $this->parser;
+    }
+
+    /**
+     * Get parser warnings.
+     *
+     * @return array Array of warning flags from the parser.
+     */
+    public function get_warnings(): array
+    {
+        if (null === $this->parser) {
+            return [];
+        }
+
+        return $this->parser->warnings ?? [];
+    }
+
+    /**
+     * Get screenshots data.
+     *
+     * @return array Array of screenshot descriptions.
+     */
+    public function get_screenshots(): array
+    {
+        if (null === $this->parser) {
+            return [];
+        }
+
+        return $this->parser->screenshots ?? [];
+    }
+
+    /**
+     * Get upgrade notices.
+     *
+     * @return array Array of version => upgrade notice.
+     */
+    public function get_upgrade_notices(): array
+    {
+        if (null === $this->parser) {
+            return [];
+        }
+
+        return $this->parser->upgrade_notice ?? [];
+    }
+
+    /**
+     * Get parsed FAQ data.
+     *
+     * @return array Array of question => answer pairs.
+     */
+    public function get_faq(): array
+    {
+        if (null === $this->parser) {
+            return [];
+        }
+
+        return $this->parser->faq ?? [];
     }
 }
