@@ -88,7 +88,7 @@ class DIDManager
 
         // Submit to PLC directory.
         try {
-            $this->plc_client->create_did($did, (array) $signed_operation->jsonSerialize());
+            $this->plc_client->create_did($did, $signed_operation->jsonSerialize());
         } catch (\RuntimeException $e) {
             throw new \RuntimeException('Failed to create DID on PLC directory: ' . $e->getMessage());
         }
@@ -204,7 +204,7 @@ class DIDManager
 
         // Sign and submit.
         $signed_operation = $operation->sign($rotation_key);
-        $this->plc_client->update_did($did, (array) $signed_operation->jsonSerialize());
+        $this->plc_client->update_did($did, $signed_operation->jsonSerialize());
 
         // Update local metadata.
         $this->key_store->update_metadata($did, $changes);
@@ -256,7 +256,7 @@ class DIDManager
         $signed_operation = $operation->sign($current_rotation_key);
 
         // Submit to PLC.
-        $this->plc_client->update_did($did, (array) $signed_operation->jsonSerialize());
+        $this->plc_client->update_did($did, $signed_operation->jsonSerialize());
 
         // Update local store with new keys.
         $this->key_store->update_keys(
@@ -333,7 +333,7 @@ class DIDManager
             );
 
             $signed_soft_op = $soft_operation->sign($rotation_key);
-            $this->plc_client->update_did($did, (array) $signed_soft_op->jsonSerialize());
+            $this->plc_client->update_did($did, $signed_soft_op->jsonSerialize());
         }
 
         // Mark as deactivated locally.

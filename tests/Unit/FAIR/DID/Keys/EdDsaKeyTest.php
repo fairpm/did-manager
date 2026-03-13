@@ -119,7 +119,6 @@ class EdDsaKeyTest extends TestCase
         $signature = $key->sign($data);
 
         $this->assertNotEmpty($signature);
-        $this->assertIsString($signature);
         // Ed25519 signatures are 64 bytes = 128 hex chars.
         $this->assertSame(128, strlen($signature));
     }

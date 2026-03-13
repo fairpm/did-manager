@@ -156,7 +156,6 @@ class CanonicalMapObjectTest extends TestCase
 
         $normalized = $map->normalize();
 
-        $this->assertIsArray($normalized);
         $this->assertArrayHasKey('key1', $normalized);
         $this->assertArrayHasKey('key2', $normalized);
         $this->assertSame('value1', $normalized['key1']);
@@ -179,7 +178,6 @@ class CanonicalMapObjectTest extends TestCase
         $map = CanonicalMapObject::create($items);
         $value = $map->getValue();
 
-        $this->assertIsArray($value);
         $this->assertContainsOnlyInstancesOf(MapItem::class, $value);
     }
 
@@ -198,7 +196,6 @@ class CanonicalMapObjectTest extends TestCase
         $map = CanonicalMapObject::create($items);
         $data = $map->getData();
 
-        $this->assertIsArray($data);
         $this->assertContainsOnlyInstancesOf(MapItem::class, $data);
     }
 
@@ -262,8 +259,8 @@ class CanonicalMapObjectTest extends TestCase
             TextStringObject::create('value1')
         );
 
-        $this->assertTrue(isset($map['key1']));
-        $this->assertFalse(isset($map['nonexistent']));
+        $this->assertTrue($map->offsetExists('key1'));
+        $this->assertFalse($map->offsetExists('nonexistent'));
     }
 
     /**
@@ -296,7 +293,7 @@ class CanonicalMapObjectTest extends TestCase
         );
 
         $this->assertCount(1, $map);
-        $this->assertTrue(isset($map['key1']));
+        $this->assertTrue($map->offsetExists('key1'));
     }
 
     /**
@@ -319,7 +316,7 @@ class CanonicalMapObjectTest extends TestCase
         unset($map['key1']);
         
         $this->assertCount(1, $map);
-        $this->assertFalse(isset($map['key1']));
+        $this->assertFalse($map->offsetExists('key1'));
     }
 
     /**
@@ -335,7 +332,6 @@ class CanonicalMapObjectTest extends TestCase
 
         $cbor = (string) $map;
 
-        $this->assertIsString($cbor);
         $this->assertNotEmpty($cbor);
         
         // Should start with CBOR map marker
@@ -346,7 +342,7 @@ class CanonicalMapObjectTest extends TestCase
 
     /**
      * Test canonical sorting matches RFC 8949 section 3.9.
-     * 
+    *
      * Keys should be sorted:
      * 1. First by length (shorter first)
      * 2. Then by byte value (lexicographic)

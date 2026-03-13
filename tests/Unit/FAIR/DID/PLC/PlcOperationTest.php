@@ -138,7 +138,6 @@ class PlcOperationTest extends TestCase
 
         $json = $operation->jsonSerialize();
 
-        $this->assertIsArray($json);
         $this->assertArrayHasKey('type', $json);
         $this->assertArrayHasKey('rotationKeys', $json);
         $this->assertArrayHasKey('verificationMethods', $json);
@@ -174,7 +173,6 @@ class PlcOperationTest extends TestCase
         $json = $signed->jsonSerialize();
 
         $this->assertArrayHasKey('sig', $json);
-        $this->assertIsString($json['sig']);
         $this->assertNotEmpty($json['sig']);
     }
 
@@ -194,7 +192,6 @@ class PlcOperationTest extends TestCase
 
         $cbor = $operation->encode_cbor();
 
-        $this->assertIsString($cbor);
         $this->assertNotEmpty($cbor);
         
         // CBOR map starts with major type 5 (0xA0-0xB7 for maps with 0-23 elements)
@@ -401,6 +398,6 @@ class PlcOperationTest extends TestCase
         $json = $operation->jsonSerialize();
         
         $this->assertIsObject($json['services']);
-        $this->assertEmpty((array) $json['services']);
+        $this->assertEmpty(get_object_vars($json['services']));
     }
 }

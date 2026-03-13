@@ -26,12 +26,12 @@ class DidCodec
     /**
      * Multicodec prefix for secp256k1 public key (0xe7)
      */
-    public const MULTICODEC_SECP256K1_PUB = "\xe7\x01";
+    public const string MULTICODEC_SECP256K1_PUB = "\xe7\x01";
 
     /**
      * Multicodec prefix for Ed25519 public key (0xed)
      */
-    public const MULTICODEC_ED25519_PUB = "\xed\x01";
+    public const string MULTICODEC_ED25519_PUB = "\xed\x01";
 
     /**
      * Convert a public key to multibase base58btc format

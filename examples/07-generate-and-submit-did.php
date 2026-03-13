@@ -21,7 +21,7 @@ use FAIR\DID\DIDManager;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-echo "=== FAIR CLI: Generate and Submit DID to PLC Directory ===\n\n";
+echo "=== FAIR DID Example: Generate and Submit DID to PLC Directory ===\n\n";
 
 echo "This example demonstrates the complete DID generation and submission workflow.\n";
 echo "All components (key generation, signing, CBOR encoding, DID generation, and\n";
@@ -170,7 +170,7 @@ try {
     
     try {
         $plc_client = new PlcClient('https://plc.directory', 30, false);  // Disable SSL verification for local dev
-        $response = $plc_client->create_did($did, (array) $signed_operation->jsonSerialize());
+        $response = $plc_client->create_did($did, $signed_operation->jsonSerialize());
         
         echo "✓ DID Submitted Successfully!\n";
         echo "  Response: " . json_encode($response) . "\n\n";
@@ -232,7 +232,7 @@ try {
         
         // Submit update.
         $plc_client = new PlcClient('https://plc.directory', 30, false);
-        $update_response = $plc_client->update_did($did, (array) $signed_update->jsonSerialize());
+        $update_response = $plc_client->update_did($did, $signed_update->jsonSerialize());
         
         echo "✓ DID Updated Successfully!\n";
         echo "  Response: " . json_encode($update_response) . "\n\n";
@@ -264,14 +264,14 @@ try {
 }
 
 // -----------------------------------------------------------------------------
-// Method 3: Using DIDManager with Plugin Integration
+// Method 3: Using DIDManager with Generic Package Metadata
 // -----------------------------------------------------------------------------
-echo "\nMETHOD 3: With WordPress Plugin Integration\n";
+echo "\nMETHOD 3: DIDManager with Generic Package Metadata\n";
 echo str_repeat('=', 70) . "\n\n";
 
 try {
     // Initialize components.
-    $storage_path = __DIR__ . '/temp-storage-plugin';
+    $storage_path = __DIR__ . '/temp-storage-package';
     if (!file_exists($storage_path)) {
         mkdir($storage_path, 0755, true);
     }
@@ -280,24 +280,20 @@ try {
     $plc_client = new PlcClient('https://plc.directory', 30, false);  // Disable SSL verification for local dev
     $did_manager = new DIDManager($key_store, $plc_client);
 
-    // Simulate a plugin path (in real scenario, this would be an actual plugin file).
-    $plugin_path = __DIR__ . '/mock-plugin.php';
-    
-    // Create mock plugin file for demonstration.
-    if (!file_exists($plugin_path)) {
-        file_put_contents($plugin_path, "<?php\n/**\n * Plugin Name: My Demo Plugin\n * Version: 1.0.0\n */\n");
-    }
-
-    echo "Creating DID for WordPress plugin...\n";
+    echo "Creating DID for a generic package record...\n";
     
     $result = $did_manager->create_did(
-        handle: 'my-demo-plugin.wordpress.org',
+        handle: 'demo-package.example.com',
         service_endpoint: null,
-        plugin_path: $plugin_path,
-        inject_id: true
+        type: 'package',
+        metadata: [
+            'packageManager' => 'composer',
+            'packageName' => 'fairpm/demo-package',
+            'distribution' => 'zip',
+        ],
     );
 
-    echo "✓ Plugin DID Created!\n\n";
+    echo "✓ Package DID Created!\n\n";
     echo "DID: {$result['did']}\n";
     echo "Handle: {$result['handle']}\n";
     echo "Service Endpoint: {$result['serviceEndpoint']}\n\n";
@@ -307,16 +303,16 @@ try {
     $stored = $key_store->get_did($result['did']);
     echo "  DID: {$stored['did']}\n";
     echo "  Type: {$stored['type']}\n";
-    echo "  Created At: {$stored['created_at']}\n";
+    echo "  Created At: {$stored['createdAt']}\n";
     echo "  Metadata Keys: " . implode(', ', array_keys($stored['metadata'])) . "\n\n";
 
-    // Clean up mock plugin file.
-    if (file_exists($plugin_path)) {
-        unlink($plugin_path);
-    }
+    echo "Package-specific metadata stored locally:\n";
+    echo "  Package Manager: {$stored['metadata']['packageManager']}\n";
+    echo "  Package Name: {$stored['metadata']['packageName']}\n";
+    echo "  Distribution: {$stored['metadata']['distribution']}\n\n";
 
-    // Update the DID with a service endpoint.
-    echo "Updating plugin DID with service endpoint...\n";
+    echo "Need WordPress plugin or theme parsing?\n";
+    echo "  Use the fairpm/did-manager-wordpress package for WordPress-specific workflows.\n\n";
     
     $service = [
         'id' => '#fairpm_repo',
@@ -333,11 +329,6 @@ try {
 } catch (\Exception $e) {
     echo "Note: {$e->getMessage()}\n";
     echo "(This is expected in local development environments)\n\n";
-    
-    // Clean up mock plugin file even on error.
-    if (isset($plugin_path) && file_exists($plugin_path)) {
-        unlink($plugin_path);
-    }
 }
 
 // -----------------------------------------------------------------------------
@@ -359,7 +350,7 @@ echo "  7. DID resolution and verification\n\n";
 echo "✓ Three methods demonstrated:\n";
 echo "  1. DIDManager (Recommended) - High-level, handles storage automatically\n";
 echo "  2. Manual Process - Low-level control for custom implementations\n";
-echo "  3. Plugin Integration - WordPress plugin-specific workflow\n\n";
+echo "  3. Generic Package Metadata - store package-specific context in the core manager\n\n";
 
 echo "✓ Key Points:\n";
 echo "  • All DID operations (create/update/resolve) go to https://plc.directory\n";
@@ -371,17 +362,12 @@ echo "  • Keep rotation keys secure - they control DID updates\n\n";
 echo "✓ Next Steps:\n";
 echo "  • See example 02 for updating DIDs\n";
 echo "  • See example 03 for secure key storage options\n";
-echo "  • See example 05 for generating metadata\n\n";
+echo "  • See the did-manager-wordpress package for WordPress parsing and metadata generation\n\n";
 
 // Clean up temporary storage.
 if (isset($storage_path) && file_exists($storage_path)) {
     array_map('unlink', glob("{$storage_path}/*.*"));
     rmdir($storage_path);
-}
-if (isset($storage_path) && file_exists($storage_path . '-plugin')) {
-    $plugin_storage = $storage_path . '-plugin';
-    array_map('unlink', glob("{$plugin_storage}/*.*"));
-    rmdir($plugin_storage);
 }
 
 echo "=== Example Complete ===\n";

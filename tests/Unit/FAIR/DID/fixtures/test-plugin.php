@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+const TEST_PLUGIN_FIXTURE = true;
+
 /**
  * Plugin Name: Test Plugin
  * Plugin URI: https://example.com/test-plugin

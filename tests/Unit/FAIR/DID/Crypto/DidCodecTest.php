@@ -259,7 +259,6 @@ class DidCodecTest extends TestCase
         $signed_operation = DidCodec::sign_plc_operation($operation, $rotation_key);
 
         $this->assertNotNull($signed_operation->sig);
-        $this->assertIsString($signed_operation->sig);
     }
 
     /**

@@ -131,7 +131,6 @@ class EcKeyTest extends TestCase
         $signature = $key->sign($data);
 
         $this->assertNotEmpty($signature);
-        $this->assertIsString($signature);
     }
 
     /**
