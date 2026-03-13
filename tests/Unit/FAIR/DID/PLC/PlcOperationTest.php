@@ -3,14 +3,13 @@
 /**
  * PlcOperation Tests
  *
- * @package FairDidManager\Tests\PLC
+ * @package Tests\Unit\FAIR\DID\PLC
  */
 
 declare(strict_types=1);
 
 namespace Tests\Unit\FAIR\DID\PLC;
 
-use FAIR\DID\Crypto\DidCodec;
 use FAIR\DID\Keys\EcKey;
 use FAIR\DID\Keys\EdDsaKey;
 use FAIR\DID\Keys\Key;

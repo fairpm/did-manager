@@ -3,7 +3,7 @@
 /**
  * EC Key class for secp256k1 and P-256 curves.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * Supports secp256k1 (K-256) and P-256 curves using the simplito/elliptic-php library.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 class EcKey implements Key
 {
@@ -112,10 +112,8 @@ class EcKey implements Key
     protected function signature_to_compact(EC $ec, Signature $signature): string
     {
         $byte_length = (int) ceil($ec->curve->n->bitLength() / 8);
-        $compact =
-            Utils::toHex($signature->r->toArray('be', $byte_length))
+        return Utils::toHex($signature->r->toArray('be', $byte_length))
             . Utils::toHex($signature->s->toArray('be', $byte_length));
-        return $compact;
     }
 
     /**

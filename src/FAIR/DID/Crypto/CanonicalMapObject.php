@@ -3,7 +3,7 @@
 /**
  * Canonical map object for CBOR encoding.
  *
- * @package FairDidManager\Crypto
+ * @package FAIR\DID\Crypto
  */
 
 declare(strict_types=1);
@@ -14,7 +14,6 @@ use ArrayAccess;
 use ArrayIterator;
 use CBOR\AbstractCBORObject;
 use CBOR\CBORObject;
-use CBOR\Countable;
 use CBOR\LengthCalculator;
 use CBOR\MapItem;
 use CBOR\Normalizable;
@@ -28,10 +27,12 @@ use IteratorAggregate;
  * Sort keys by length first, then by byte value.
  *
  * @see https://datatracker.ietf.org/doc/html/rfc8949#section-4.2
+ * @implements IteratorAggregate<array-key, MapItem>
+ * @implements ArrayAccess<array-key, MapItem>
  */
 class CanonicalMapObject extends AbstractCBORObject implements \Countable, IteratorAggregate, Normalizable, ArrayAccess
 {
-    private const MAJOR_TYPE = self::MAJOR_TYPE_MAP;
+    private const int MAJOR_TYPE = self::MAJOR_TYPE_MAP;
 
     /**
      * The map data.
@@ -55,7 +56,7 @@ class CanonicalMapObject extends AbstractCBORObject implements \Countable, Itera
     public function __construct(array $data = [])
     {
         [$additional_information, $length] = LengthCalculator::getLengthOfArray($data);
-        array_map(static function ($item): void {
+        array_map(static function (MapItem $item): void {
             if (!$item instanceof MapItem) {
                 throw new InvalidArgumentException('The list must contain only MapItem objects.');
             }
@@ -75,20 +76,20 @@ class CanonicalMapObject extends AbstractCBORObject implements \Countable, Itera
      */
     public function __toString(): string
     {
-        // Get numeric array of items for sorting
+        // Get numeric array of items for sorting.
         $items = array_values($this->data);
-        
-        usort($items, function ($a, $b) {
+
+        usort($items, static function (MapItem $a, MapItem $b): int {
             // Get the CBOR-encoded representation of the keys for comparison.
             $a_key = (string) $a->getKey();
             $b_key = (string) $b->getKey();
-            
+
             // Sort by length first.
             $length_compare = strlen($a_key) <=> strlen($b_key);
             if ($length_compare !== 0) {
                 return $length_compare;
             }
-            
+
             // Then by byte value.
             return strcmp($a_key, $b_key);
         });

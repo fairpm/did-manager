@@ -3,7 +3,7 @@
 /**
  * CanonicalMapObject Tests
  *
- * @package FairDidManager\Tests\Crypto
+ * @package Tests\Unit\FAIR\DID\Crypto
  */
 
 declare(strict_types=1);

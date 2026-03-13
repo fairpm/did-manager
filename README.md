@@ -1,15 +1,14 @@
 # FAIR DID Manager
 
-A PHP library for DID (Decentralized Identifier) management and WordPress plugin/theme metadata generation, implementing the FAIR (Federated Asset Integrity Registry) protocol.
+`fairpm/did-manager` is the core FAIR DID library. It contains generic DID lifecycle management, PLC operations, key generation/export, and local key storage.
 
 ## Features
 
-- **DID Management**: Create, update, rotate keys, and deactivate DIDs using the PLC directory
-- **Key Generation**: Generate secp256k1 (rotation) and Ed25519 (verification) key pairs
-- **Key Export**: Export keys in JSON, text, or environment variable formats
-- **Local Key Storage**: Securely store and manage DIDs and their associated keys
-- **WordPress Integration**: Parse plugin/theme headers and readme.txt files
-- **Metadata Generation**: Generate FAIR-compliant metadata.json files
+- Create, resolve, update, rotate, and deactivate `did:plc` identifiers
+- Generate secp256k1 rotation keys and Ed25519 verification keys
+- Encode/sign PLC operations with CBOR and multibase helpers
+- Store DIDs, keys, and generic metadata locally
+- Export keys in JSON, text, and environment-variable formats
 
 ## Requirements
 
@@ -25,271 +24,69 @@ cd did-manager
 composer install
 ```
 
+For WordPress package metadata parsing, install `fairpm/did-manager-wordpress` alongside this package.
+
 ## Quick Start
 
 ```php
 <?php
+
 require_once 'vendor/autoload.php';
 
-use FairDidManager\Crypto\DidCodec;
-use FairDidManager\Storage\KeyStore;
-use FairDidManager\Plc\PlcClient;
-use FairDidManager\Did\FairDidManager;
+use FAIR\DID\DIDManager;
+use FAIR\DID\PLC\PlcClient;
+use FAIR\DID\Storage\KeyStore;
 
-// Initialize components
-$store = new KeyStore('keys.json');
+$store = new KeyStore(__DIR__ . '/keys.json');
 $client = new PlcClient();
-$manager = new FairDidManager($store, $client);
+$manager = new DIDManager($store, $client);
 
-// Create a new DID
-$result = $manager->create_did('my-plugin-handle');
-echo "Created DID: " . $result['did'];
-```
+$result = $manager->create_did(
+	handle: 'example-package',
+	service_endpoint: 'https://example.com/did-endpoint',
+	type: 'package',
+	metadata: ['owner' => 'Example Org'],
+);
 
-## Project Structure
-
-```
-did-manager/
-├── src/
-│   ├── crypto/          # Cryptographic utilities
-│   │   ├── class-did-codec.php
-│   │   └── class-canonical-map-object.php
-│   ├── did/             # DID lifecycle management
-│   │   └── class-fair-did-manager.php
-│   ├── keys/            # Key interfaces and implementations
-│   │   ├── class-key.php
-│   │   ├── class-ec-key.php
-│   │   ├── class-ed-dsa-key.php
-│   │   ├── class-key-exporter.php
-│   │   └── class-key-factory.php
-│   ├── parsers/         # WordPress metadata parsing
-│   │   ├── class-plugin-header-parser.php
-│   │   ├── class-readme-parser.php
-│   │   └── class-metadata-generator.php
-│   ├── plc/             # PLC directory interaction
-│   │   ├── class-plc-client.php
-│   │   └── class-plc-operation.php
-│   └── storage/         # Local key storage
-│       └── class-key-store.php
-├── tests/               # PHPUnit tests (200+ tests)
-├── examples/            # Usage examples
-├── composer.json
-├── phpunit.xml
-└── fair-did.json        # Package DID configuration
+echo $result['did'] . PHP_EOL;
 ```
 
 ## Namespaces
 
-| Namespace | Description |
-|-----------|-------------|
-| `FairDidManager\Keys` | Key interface and implementations (EcKey, EdDsaKey, KeyFactory, KeyExporter) |
-| `FairDidManager\Crypto` | Cryptographic utilities (DidCodec, CanonicalMapObject) |
-| `FairDidManager\Plc` | PLC directory interaction (PlcOperation, PlcClient) |
-| `FairDidManager\Storage` | Local storage (KeyStore) |
-| `FairDidManager\Parsers` | WordPress metadata parsing (PluginHeaderParser, ReadmeParser, MetadataGenerator) |
-| `FairDidManager\Did` | DID lifecycle management (FairDidManager) |
+- `FAIR\DID\Crypto` for encoding, canonicalization, and DID helpers
+- `FAIR\DID\Keys` for key generation, decoding, and export
+- `FAIR\DID\PLC` for PLC client and operation objects
+- `FAIR\DID\Storage` for local key/DID persistence
+- `FAIR\DID` for high-level DID lifecycle orchestration
 
 ## Examples
 
-See the [`examples/`](examples/) directory for detailed usage examples:
+Core examples remain in [examples](examples):
 
-- `01-generate-keys.php` - Key generation and signing
-- `02-plc-operations.php` - PLC operations and DID generation
-- `03-key-storage.php` - Local key storage management
-- `04-parse-plugin-headers.php` - WordPress header parsing
-- `05-generate-metadata.php` - FAIR metadata generation
-- `06-export-keys.php` - Export keys in various formats
+- `01-generate-keys.php`
+- `02-plc-operations.php`
+- `03-key-storage.php`
+- `06-export-keys.php`
+- `07-generate-and-submit-did.php`
 
-Run an example:
-
-```bash
-php examples/01-generate-keys.php
-```
-
-## API Overview
-
-### Key Generation
-
-```php
-use FairDidManager\Crypto\DidCodec;
-
-// Generate secp256k1 key pair (for rotation keys)
-$rotationKey = DidCodec::generate_key_pair();
-
-// Generate Ed25519 key pair (for verification keys)
-$verificationKey = DidCodec::generate_ed25519_key_pair();
-
-// Sign data
-$signature = $rotationKey->sign(hash('sha256', $data, false));
-```
-
-### Key Export
-
-```php
-use FairDidManager\Keys\EcKey;
-
-$key = EcKey::generate();
-
-// Export as JSON (default)
-echo $key->export();
-
-// Export with private key included
-echo $key->export(null, true);
-
-// Export as human-readable text
-echo $key->export(null, true, 'text');
-
-// Export as environment variables
-echo $key->export(null, true, 'env');
-
-// Save to file
-$key->export('/path/to/key.json', true, 'json');
-
-// Get as array for programmatic use
-$data = $key->to_array(true);
-```
-
-### DID Creation
-
-```php
-use FairDidManager\Crypto\DidCodec;
-
-// Create a PLC operation
-$operation = DidCodec::create_plc_operation(
-    $rotationKey,
-    $verificationKey,
-    'my-handle',
-    'https://api.example.com'
-);
-
-// Sign the operation
-$signedOperation = DidCodec::sign_plc_operation($operation, $rotationKey);
-
-// Generate the DID
-$did = DidCodec::generate_plc_did($signedOperation);
-```
-
-### Key Storage
-
-```php
-use FairDidManager\Storage\KeyStore;
-
-$store = new KeyStore('keys.json');
-
-// Store a DID with keys
-$store->store_did(
-    $did,
-    $rotationKey->encode_private(),
-    $rotationKey->encode_public(),
-    $verificationKey->encode_private(),
-    $verificationKey->encode_public(),
-    'plugin',
-    ['name' => 'My Plugin']
-);
-
-// Retrieve keys
-$rotationPrivate = $store->get_rotation_key($did);
-```
-
-### WordPress Metadata Parsing
-
-```php
-use FairDidManager\Parsers\PluginHeaderParser;
-use FairDidManager\Parsers\ReadmeParser;
-use FairDidManager\Parsers\MetadataGenerator;
-
-// Parse plugin header
-$headerParser = new PluginHeaderParser();
-$headerData = $headerParser->parse_file('/path/to/plugin.php');
-
-// Parse readme.txt
-$readmeParser = new ReadmeParser();
-$readmeData = $readmeParser->parse_file('/path/to/readme.txt');
-
-// Generate FAIR metadata
-$generator = new MetadataGenerator($headerData, $readmeData);
-$generator->set_did($did);
-$metadata = $generator->generate();
-```
+WordPress examples were moved to the `did-manager-wordpress` package.
 
 ## Testing
 
-Run the test suite:
-
 ```bash
 composer test
-```
-
-Run with coverage:
-
-```bash
-composer test -- --coverage-html coverage
-```
-
-Lint the code:
-
-```bash
 composer lint
+composer analyze
 ```
 
-Fix coding standards:
+## Related Packages
 
-```bash
-composer lint:fix
-```
-
-## Dependencies
-
-- [simplito/elliptic-php](https://github.com/nickolasburr/php-elliptic) - Elliptic curve cryptography
-- [spomky-labs/cbor-php](https://github.com/Spomky-Labs/cbor-php) - CBOR encoding for DAG-CBOR
-- [yocto/yoclib-multibase](https://packagist.org/packages/yocto/yoclib-multibase) - Multibase encoding
+- `fairpm/did-manager-wordpress` for WordPress header parsing, readme parsing, and FAIR metadata generation
 
 ## Security
 
-⚠️ **Important**: Never commit private keys to version control!
-
-- Private keys are stored locally in JSON files (e.g., `keys.json`)
-- The `.gitignore` file excludes common key storage patterns
-- Always back up your keys securely
+Never commit private keys or generated keystore files to version control.
 
 ## License
 
-GPL-3.0-or-later - see [LICENSE](LICENSE) for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Related Projects
-
-- [FAIR Protocol Specification](https://fair-protocol.org)
-- [AT Protocol](https://atproto.com)
-- [DID:PLC Method](https://github.com/did-method-plc/did-method-plc)
-
-## Attributions
-
-This project uses the following open-source libraries:
-
-### Runtime Dependencies
-
-| Library | License | Description |
-|---------|---------|-------------|
-| [afragen/wordpress-plugin-readme-parser](https://github.com/afragen/wordpress-plugin-readme-parser) | GPL-3.0-or-later | Based on WordPress.org Plugin Directory readme parser |
-| [simplito/elliptic-php](https://github.com/simplito/elliptic-php) | MIT | Elliptic curve cryptography for secp256k1 signatures |
-| [spomky-labs/cbor-php](https://github.com/Spomky-Labs/cbor-php) | MIT | CBOR encoder/decoder for DAG-CBOR operations |
-| [yocto/yoclib-multibase](https://packagist.org/packages/yocto/yoclib-multibase) | GPL-3.0-or-later | Multibase encoding implementation |
-
-### Transitive Dependencies
-
-| Library | License | Description |
-|---------|---------|-------------|
-| [erusev/parsedown](https://github.com/erusev/Parsedown) | MIT | Markdown parser (required by wordpress-plugin-readme-parser) |
-| [simplito/bigint-wrapper-php](https://github.com/simplito/bigint-wrapper-php) | MIT | BigInt wrapper (required by elliptic-php) |
-| [simplito/bn-php](https://github.com/simplito/bn-php) | MIT | Big number library (required by elliptic-php) |
-| [brick/math](https://github.com/brick/math) | MIT | Arbitrary-precision arithmetic (required by cbor-php) |
-
-All dependencies are used in compliance with their respective licenses.
+GPL-3.0-or-later. See `LICENSE.md` for details.

@@ -5,7 +5,7 @@
  * This example demonstrates how to export keys in different formats
  * and save them to files.
  *
- * @package FairDidManager\Examples
+ * @package FAIR\DID\Examples
  */
 
 declare(strict_types=1);

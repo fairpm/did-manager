@@ -3,12 +3,12 @@
 /**
  * KeyStore - Local key and DID storage
  *
- * @package FairDidManager\Storage
+ * @package FAIR\DID\Storage
  */
 
 declare(strict_types=1);
 
-namespace FAIR\DID\Sorage;
+namespace FAIR\DID\Storage;
 
 /**
  * KeyStore - Local key and DID storage.
@@ -47,7 +47,8 @@ class KeyStore
     {
         if (file_exists($this->store_path)) {
             $content = file_get_contents($this->store_path);
-            $this->data = json_decode($content, true) ?? [];
+            $decoded = is_string($content) ? json_decode($content, true) : null;
+            $this->data = is_array($decoded) ? $decoded : [];
         } else {
             $this->data = ['dids' => []];
         }
@@ -62,7 +63,7 @@ class KeyStore
     {
         $dir = dirname($this->store_path);
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0600, true)) {
+            if (!mkdir($dir, 0o700, true)) {
                 throw new \RuntimeException("Unable to create directory: {$dir}");
             }
         }
@@ -165,7 +166,7 @@ class KeyStore
         string $verification_key_pem,
         string $verification_key_multibase,
     ): void {
-        if (!isset($this->data['dids'][$did])) {
+        if (!array_key_exists($did, $this->data['dids'])) {
             throw new \RuntimeException("DID not found in keystore: {$did}");
         }
 
@@ -190,7 +191,7 @@ class KeyStore
      */
     public function deactivate(string $did): void
     {
-        if (!isset($this->data['dids'][$did])) {
+        if (!array_key_exists($did, $this->data['dids'])) {
             throw new \RuntimeException("DID not found in keystore: {$did}");
         }
 
@@ -229,7 +230,7 @@ class KeyStore
      */
     public function exists(string $did): bool
     {
-        return isset($this->data['dids'][$did]);
+        return array_key_exists($did, $this->data['dids']);
     }
 
     /**
@@ -253,7 +254,7 @@ class KeyStore
      */
     public function update_metadata(string $did, array $metadata): void
     {
-        if (!isset($this->data['dids'][$did])) {
+        if (!array_key_exists($did, $this->data['dids'])) {
             throw new \RuntimeException("DID not found in keystore: {$did}");
         }
 
@@ -274,7 +275,7 @@ class KeyStore
      */
     public function delete(string $did): bool
     {
-        if (!isset($this->data['dids'][$did])) {
+        if (!array_key_exists($did, $this->data['dids'])) {
             return false;
         }
 

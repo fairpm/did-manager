@@ -3,14 +3,12 @@
 /**
  * PlcClient - Bluesky PLC Directory API Client
  *
- * @package FairDidManager\Plc
+ * @package FAIR\DID\PLC
  */
 
 declare(strict_types=1);
 
 namespace FAIR\DID\PLC;
-
-use FAIR\DID\Crypto\DidCodec;
 
 /**
  * PlcClient - Bluesky PLC Directory API Client.

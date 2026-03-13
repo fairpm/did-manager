@@ -5,7 +5,7 @@
  * This example demonstrates how to create and sign PLC operations
  * for DID creation and updates.
  *
- * @package FairDidManager\Examples
+ * @package FAIR\DID\Examples
  */
 
 declare(strict_types=1);

@@ -3,7 +3,7 @@
 /**
  * PLC Operation class for DID operations.
  *
- * @package FairDidManager\Plc
+ * @package FAIR\DID\PLC
  */
 
 declare(strict_types=1);
@@ -12,7 +12,6 @@ namespace FAIR\DID\PLC;
 
 use CBOR\ListObject;
 use CBOR\MapItem;
-use CBOR\MapObject;
 use CBOR\OtherObject\NullObject;
 use CBOR\TextStringObject;
 use Exception;
@@ -27,7 +26,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * Represents a PLC operation for creating or updating DIDs.
  *
- * @package FairDidManager\Plc
+ * @package FAIR\DID\PLC
  */
 class PlcOperation implements JsonSerializable
 {
@@ -225,7 +224,7 @@ class PlcOperation implements JsonSerializable
                 TextStringObject::create('alsoKnownAs'),
                 ListObject::create(
                     array_map(
-                        fn($key) => TextStringObject::create($key),
+                        static fn(string $key): TextStringObject => TextStringObject::create($key),
                         $this->also_known_as,
                     ),
                 ),
@@ -238,7 +237,7 @@ class PlcOperation implements JsonSerializable
                 TextStringObject::create('rotationKeys'),
                 ListObject::create(
                     array_map(
-                        fn(Key $key) => TextStringObject::create(KeyFactory::encode_did_key($key)),
+                        static fn(Key $key): TextStringObject => TextStringObject::create(KeyFactory::encode_did_key($key)),
                         $this->rotation_keys,
                     ),
                 ),
@@ -336,7 +335,7 @@ class PlcOperation implements JsonSerializable
         $data = [
             'type' => $this->type,
             'rotationKeys' => array_map(
-                fn(Key $key) => KeyFactory::encode_did_key($key),
+                static fn(Key $key): string => KeyFactory::encode_did_key($key),
                 $this->rotation_keys,
             ),
             'verificationMethods' => $methods,
@@ -373,9 +372,16 @@ class PlcOperation implements JsonSerializable
     public static function base64url_decode(string $data): string
     {
         $translated = strtr($data, '-_', '+/');
-        $padded = str_pad($translated, strlen($data) % 4, '=', STR_PAD_RIGHT);
+        $padding = (4 - (strlen($translated) % 4)) % 4;
+        $padded = str_pad($translated, strlen($translated) + $padding, '=', STR_PAD_RIGHT);
         // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
-        return base64_decode($padded);
+        $decoded = base64_decode($padded, true);
+
+        if (false === $decoded) {
+            throw new \RuntimeException('Invalid base64url string.');
+        }
+
+        return $decoded;
     }
 
     /**

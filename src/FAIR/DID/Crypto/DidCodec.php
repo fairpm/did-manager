@@ -3,7 +3,7 @@
 /**
  * DID Codec - Multibase, Canonical JSON, and Signing Helpers
  *
- * @package FairDidManager\Crypto
+ * @package FAIR\DID\Crypto
  */
 
 declare(strict_types=1);
@@ -19,7 +19,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
 /**
  * DID Codec class for multibase, canonical JSON, and signing helpers.
  *
- * @package FairDidManager\Crypto
+ * @package FAIR\DID\Crypto
  */
 class DidCodec
 {
@@ -80,7 +80,13 @@ class DidCodec
     public static function canonical_json(mixed $data): string
     {
         $sorted = self::recursive_key_sort($data);
-        return json_encode($sorted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $encoded = json_encode($sorted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if (false === $encoded) {
+            throw new \RuntimeException('Failed to encode canonical JSON.');
+        }
+
+        return $encoded;
     }
 
     /**

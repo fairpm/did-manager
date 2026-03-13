@@ -3,7 +3,7 @@
 /**
  * PlcClient Tests
  *
- * @package FairDidManager\Tests\Plc
+ * @package Tests\Unit\FAIR\DID\PLC
  */
 
 declare(strict_types=1);

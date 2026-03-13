@@ -3,7 +3,7 @@
 /**
  * Key Factory for decoding multibase keys.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 
 declare(strict_types=1);
@@ -18,7 +18,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * Provides factory methods to decode multibase-encoded keys into the appropriate Key implementation.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 class KeyFactory
 {
@@ -32,7 +32,7 @@ class KeyFactory
     public static function decode_public_key(string $key): Key
     {
         static $cache = [];
-        if (isset($cache[$key])) {
+        if (array_key_exists($key, $cache)) {
             return $cache[$key];
         }
 
@@ -59,7 +59,7 @@ class KeyFactory
     public static function decode_private_key(string $key): Key
     {
         static $cache = [];
-        if (isset($cache[$key])) {
+        if (array_key_exists($key, $cache)) {
             return $cache[$key];
         }
 

@@ -5,13 +5,13 @@
  * This example demonstrates how to use the KeyStore class to
  * store and manage DIDs and their associated keys locally.
  *
- * @package FairDidManager\Examples
+ * @package FAIR\DID\Examples
  */
 
 declare(strict_types=1);
 
 use FAIR\DID\Crypto\DidCodec;
-use FAIR\DID\Sorage\KeyStore;
+use FAIR\DID\Storage\KeyStore;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

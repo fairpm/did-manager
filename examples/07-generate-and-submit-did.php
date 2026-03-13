@@ -9,14 +9,14 @@
  * 4. Generating the DID
  * 5. Submitting it to the PLC directory
  *
- * @package FairDidManager\Examples
+ * @package FAIR\DID\Examples
  */
 
 declare(strict_types=1);
 
 use FAIR\DID\Crypto\DidCodec;
 use FAIR\DID\PLC\PlcClient;
-use FAIR\DID\Sorage\KeyStore;
+use FAIR\DID\Storage\KeyStore;
 use FAIR\DID\DIDManager;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -55,8 +55,7 @@ try {
     $result = $did_manager->create_did(
         handle: 'my-wordpress-plugin.example.com',
         service_endpoint: null,
-        plugin_path: null,
-        inject_id: false
+        type: 'package'
     );
 
     echo "✓ DID Created and Submitted Successfully!\n\n";

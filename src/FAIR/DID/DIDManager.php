@@ -1,9 +1,9 @@
 <?php
 
 /**
- * FairDidManager - DID lifecycle management
+ * DIDManager - DID lifecycle management
  *
- * @package FairDidManager\Did
+ * @package FAIR\DID
  */
 
 declare(strict_types=1);
@@ -14,10 +14,10 @@ use FAIR\DID\Crypto\DidCodec;
 use FAIR\DID\Keys\KeyFactory;
 use FAIR\DID\PLC\PlcClient;
 use FAIR\DID\PLC\PlcOperation;
-use FAIR\DID\Sorage\KeyStore;
+use FAIR\DID\Storage\KeyStore;
 
 /**
- * FairDidManager - DID lifecycle management.
+ * DIDManager - DID lifecycle management.
  *
  * Manages the full lifecycle of DIDs including creation, resolution,
  * updates, key rotation, and deactivation.
@@ -55,16 +55,16 @@ class DIDManager
      *
      * @param string|null $handle           Optional handle/alias.
      * @param string|null $service_endpoint Optional service endpoint URL.
-     * @param string|null $plugin_path      Optional plugin path for header injection.
-     * @param bool        $inject_id        Whether to inject Plugin ID header.
+     * @param string|null $type             Optional DID owner type.
+     * @param array       $metadata         Optional metadata to store with the DID.
      * @return array Created DID info.
      * @throws \RuntimeException On failure.
      */
     public function create_did(
         ?string $handle = null,
         ?string $service_endpoint = null,
-        ?string $plugin_path = null,
-        bool $inject_id = false,
+        ?string $type = null,
+        array $metadata = [],
     ): array {
         // Generate rotation key pair (secp256k1).
         $rotation_key = DidCodec::generate_key_pair();
@@ -93,12 +93,6 @@ class DIDManager
             throw new \RuntimeException('Failed to create DID on PLC directory: ' . $e->getMessage());
         }
 
-        // Determine type from plugin path.
-        $type = null;
-        if (null !== $plugin_path) {
-            $type = $this->detect_package_type($plugin_path);
-        }
-
         // Store DID and keys locally.
         $this->key_store->store_did(
             $did,
@@ -107,17 +101,14 @@ class DIDManager
             $verification_key->encode_private(),
             $verification_key->encode_public(),
             $type,
-            [
+            array_merge(
+                [
                 'handle' => $handle,
                 'serviceEndpoint' => $service_endpoint,
-                'pluginPath' => $plugin_path,
-            ],
+                ],
+                $metadata,
+            ),
         );
-
-        // Inject Plugin ID header if requested.
-        if ($inject_id && null !== $plugin_path) {
-            $this->inject_plugin_id($plugin_path, $did);
-        }
 
         return [
             'did' => $did,
@@ -190,11 +181,11 @@ class DIDManager
         $services = $current_doc['services'] ?? [];
 
         // Apply changes.
-        if (isset($changes['handle'])) {
+        if (array_key_exists('handle', $changes)) {
             $also_known_as = ['at://' . $changes['handle']];
         }
 
-        if (isset($changes['service'])) {
+        if (array_key_exists('service', $changes)) {
             $services['atproto_pds'] = [
                 'type' => 'AtprotoPersonalDataServer',
                 'endpoint' => $changes['service'],
@@ -359,82 +350,5 @@ class DIDManager
     public function list_local_dids(): array
     {
         return $this->key_store->list_dids();
-    }
-
-    /**
-     * Detect package type from path.
-     *
-     * @param string $path Path to package.
-     * @return string|null Type (plugin, theme, or null).
-     */
-    private function detect_package_type(string $path): ?string
-    {
-        // Check for theme.
-        if (file_exists($path . '/style.css')) {
-            $content = file_get_contents($path . '/style.css', false, null, 0, 8192);
-            if (preg_match('/Theme Name:/i', $content)) {
-                return 'theme';
-            }
-        }
-
-        // Check for plugin.
-        $files = glob($path . '/*.php');
-        foreach ($files as $file) {
-            $content = file_get_contents($file, false, null, 0, 8192);
-            if (preg_match('/Plugin Name:/i', $content)) {
-                return 'plugin';
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Inject Plugin ID into plugin header.
-     *
-     * @param string $path Path to plugin.
-     * @param string $did The DID to inject.
-     * @throws \RuntimeException On failure.
-     */
-    private function inject_plugin_id(string $path, string $did): void
-    {
-        // Find the main plugin file.
-        $files = glob($path . '/*.php');
-        $main_file = null;
-
-        foreach ($files as $file) {
-            $content = file_get_contents($file, false, null, 0, 8192);
-            if (preg_match('/Plugin Name:/i', $content)) {
-                $main_file = $file;
-                break;
-            }
-        }
-
-        if (null === $main_file) {
-            throw new \RuntimeException("Could not find main plugin file in: {$path}");
-        }
-
-        $content = file_get_contents($main_file);
-
-        // Check if Plugin ID already exists.
-        if (preg_match('/Plugin ID:/i', $content)) {
-            // Update existing.
-            $content = preg_replace(
-                '/(\*\s*Plugin ID:\s*).*/i',
-                '$1' . $did,
-                $content,
-            );
-        } else {
-            // Add after Plugin Name.
-            $content = preg_replace(
-                '/(\*\s*Plugin Name:\s*[^\n]+)/i',
-                "$1\n * Plugin ID: {$did}",
-                $content,
-            );
-        }
-
-        if (false === file_put_contents($main_file, $content)) {
-            throw new \RuntimeException("Failed to write to: {$main_file}");
-        }
     }
 }
