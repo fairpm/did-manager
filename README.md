@@ -66,8 +66,8 @@ Core examples remain in [examples](examples):
 - `01-generate-keys.php`
 - `02-plc-operations.php`
 - `03-key-storage.php`
-- `06-export-keys.php`
-- `07-generate-and-submit-did.php`
+- `04-export-keys.php`
+- `05-generate-and-submit-did.php`
 
 WordPress examples were moved to the `did-manager-wordpress` package.
 

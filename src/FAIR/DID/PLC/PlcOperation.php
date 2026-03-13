@@ -237,7 +237,9 @@ class PlcOperation implements JsonSerializable
                 TextStringObject::create('rotationKeys'),
                 ListObject::create(
                     array_map(
-                        static fn(Key $key): TextStringObject => TextStringObject::create(KeyFactory::encode_did_key($key)),
+                        static fn(Key $key): TextStringObject => TextStringObject::create(KeyFactory::encode_did_key(
+                            $key,
+                        )),
                         $this->rotation_keys,
                     ),
                 ),

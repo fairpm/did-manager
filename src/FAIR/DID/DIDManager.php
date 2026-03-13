@@ -103,8 +103,8 @@ class DIDManager
             $type,
             array_merge(
                 [
-                'handle' => $handle,
-                'serviceEndpoint' => $service_endpoint,
+                    'handle' => $handle,
+                    'serviceEndpoint' => $service_endpoint,
                 ],
                 $metadata,
             ),

@@ -27,7 +27,7 @@ class PlcOperationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Generate test keys
         $this->rotation_key = EcKey::generate(Key::CURVE_K256);
         $this->verification_key = EdDsaKey::generate(Key::CURVE_ED25519);
@@ -44,7 +44,7 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $this->assertSame('plc_operation', $operation->type);
@@ -64,8 +64,8 @@ class PlcOperationTest extends TestCase
         $services = [
             'atproto_pds' => [
                 'type' => 'AtprotoPersonalDataServer',
-                'endpoint' => 'https://pds.example.com'
-            ]
+                'endpoint' => 'https://pds.example.com',
+            ],
         ];
 
         $operation = new PlcOperation(
@@ -74,7 +74,7 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             $services,
-            null
+            null,
         );
 
         $this->assertCount(1, $operation->services);
@@ -96,7 +96,7 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            $prev_cid
+            $prev_cid,
         );
 
         $this->assertSame($prev_cid, $operation->prev);
@@ -115,7 +115,7 @@ class PlcOperationTest extends TestCase
             [],
             [],
             [],
-            $prev_cid
+            $prev_cid,
         );
 
         $this->assertSame('plc_tombstone', $operation->type);
@@ -133,7 +133,7 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $json = $operation->jsonSerialize();
@@ -164,7 +164,7 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         // Sign the operation
@@ -187,13 +187,13 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $cbor = $operation->encode_cbor();
 
         $this->assertNotEmpty($cbor);
-        
+
         // CBOR map starts with major type 5 (0xA0-0xB7 for maps with 0-23 elements)
         $firstByte = ord($cbor[0]);
         $majorType = $firstByte >> 5;
@@ -211,14 +211,14 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $did = $operation->generate_did();
 
         $this->assertStringStartsWith('did:plc:', $did);
         $this->assertSame(32, strlen($did)); // 'did:plc:' (8 chars) + 24 chars
-        
+
         // Verify it's base32 lowercase
         $identifier = substr($did, 8);
         $this->assertMatchesRegularExpression('/^[a-z2-7]{24}$/', $identifier);
@@ -235,7 +235,7 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $did1 = $operation->generate_did();
@@ -295,11 +295,11 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $this->assertCount(2, $operation->rotation_keys);
-        
+
         $json = $operation->jsonSerialize();
         $this->assertCount(2, $json['rotationKeys']);
     }
@@ -317,15 +317,15 @@ class PlcOperationTest extends TestCase
             [$this->rotation_key],
             [
                 'atproto' => $key1,
-                'backup' => $key2
+                'backup' => $key2,
             ],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $this->assertCount(2, $operation->verification_methods);
-        
+
         $json = $operation->jsonSerialize();
         $this->assertCount(2, $json['verificationMethods']);
         $this->assertArrayHasKey('atproto', $json['verificationMethods']);
@@ -343,14 +343,14 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             [
                 'at://test.example.com',
-                'at://test2.example.com'
+                'at://test2.example.com',
             ],
             [],
-            null
+            null,
         );
 
         $this->assertCount(2, $operation->also_known_as);
-        
+
         $json = $operation->jsonSerialize();
         $this->assertCount(2, $json['alsoKnownAs']);
     }
@@ -363,8 +363,8 @@ class PlcOperationTest extends TestCase
         $services = [
             'atproto_pds' => [
                 'type' => 'AtprotoPersonalDataServer',
-                'endpoint' => 'https://pds.example.com'
-            ]
+                'endpoint' => 'https://pds.example.com',
+            ],
         ];
 
         $operation = new PlcOperation(
@@ -373,11 +373,11 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             $services,
-            null
+            null,
         );
 
         $json = $operation->jsonSerialize();
-        
+
         $this->assertIsObject($json['services']);
     }
 
@@ -392,11 +392,11 @@ class PlcOperationTest extends TestCase
             ['atproto' => $this->verification_key],
             ['at://test.example.com'],
             [],
-            null
+            null,
         );
 
         $json = $operation->jsonSerialize();
-        
+
         $this->assertIsObject($json['services']);
         $this->assertEmpty(get_object_vars($json['services']));
     }

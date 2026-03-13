@@ -129,11 +129,11 @@ class CanonicalMapObject extends AbstractCBORObject implements \Countable, Itera
         if (!$key instanceof Normalizable) {
             throw new InvalidArgumentException('Invalid key. Shall be normalizable');
         }
-        
+
         // Store by normalized key to allow overwriting
         $normalizedKey = $key->normalize();
         $this->data[$normalizedKey] = MapItem::create($key, $value);
-        
+
         // Recalculate length - need to get numeric array for count
         $items = array_values($this->data);
         [$this->additionalInformation, $this->length] = LengthCalculator::getLengthOfArray($items);
@@ -173,25 +173,25 @@ class CanonicalMapObject extends AbstractCBORObject implements \Countable, Itera
             if (!$item instanceof MapItem) {
                 continue;
             }
-            
+
             $key = $item->getKey();
             $value = $item->getValue();
-            
+
             if ($key instanceof Normalizable) {
                 $key = $key->normalize();
             }
             if ($value instanceof Normalizable) {
                 $value = $value->normalize();
             }
-            
+
             $result[$key] = $value;
         }
-        
+
         return $result;
     }
 
     // ArrayAccess implementation.
-    
+
     /**
      * @param mixed $offset
      */
@@ -217,13 +217,13 @@ class CanonicalMapObject extends AbstractCBORObject implements \Countable, Itera
         if (!$value instanceof MapItem) {
             throw new InvalidArgumentException('Value must be a MapItem');
         }
-        
+
         if ($offset === null) {
             $this->data[] = $value;
         } else {
             $this->data[$offset] = $value;
         }
-        
+
         [$this->additionalInformation, $this->length] = LengthCalculator::getLengthOfArray($this->data);
     }
 
@@ -234,19 +234,19 @@ class CanonicalMapObject extends AbstractCBORObject implements \Countable, Itera
     {
         unset($this->data[$offset]);
         $this->data = array_values($this->data);
-        
+
         [$this->additionalInformation, $this->length] = LengthCalculator::getLengthOfArray($this->data);
     }
 
     // Countable implementation.
-    
+
     public function count(): int
     {
         return count($this->data);
     }
 
     // IteratorAggregate implementation.
-    
+
     public function getIterator(): \Traversable
     {
         return new ArrayIterator($this->data);

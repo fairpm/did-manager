@@ -11,8 +11,8 @@ cd did-manager
 php examples/01-generate-keys.php
 php examples/02-plc-operations.php
 php examples/03-key-storage.php
-php examples/06-export-keys.php
-php examples/07-generate-and-submit-did.php
+php examples/04-export-keys.php
+php examples/05-generate-and-submit-did.php
 ```
 
 ## Example Overview

@@ -112,8 +112,10 @@ class EcKey implements Key
     protected function signature_to_compact(EC $ec, Signature $signature): string
     {
         $byte_length = (int) ceil($ec->curve->n->bitLength() / 8);
-        return Utils::toHex($signature->r->toArray('be', $byte_length))
-            . Utils::toHex($signature->s->toArray('be', $byte_length));
+        return (
+            Utils::toHex($signature->r->toArray('be', $byte_length))
+            . Utils::toHex($signature->s->toArray('be', $byte_length))
+        );
     }
 
     /**

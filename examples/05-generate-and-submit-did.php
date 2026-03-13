@@ -53,7 +53,7 @@ try {
     echo "1. Creating DID with handle...\n";
     
     $result = $did_manager->create_did(
-        handle: 'my-wordpress-plugin.example.com',
+        handle: 'example-package.example.com',
         service_endpoint: null,
         type: 'package'
     );
@@ -127,7 +127,7 @@ try {
     echo "Step 2: Creating PLC Operation\n";
     echo str_repeat('-', 50) . "\n";
     
-    $handle = 'manual-plugin.example.com';
+    $handle = 'manual-package.example.com';
     $service_endpoint = null;
     
     $operation = DidCodec::create_plc_operation(
