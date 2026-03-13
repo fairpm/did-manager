@@ -3,7 +3,7 @@
 /**
  * CanonicalMapObject Tests
  *
- * @package FairDidManager\Tests\Crypto
+ * @package Tests\Unit\FAIR\DID\Crypto
  */
 
 declare(strict_types=1);
@@ -40,12 +40,12 @@ class CanonicalMapObjectTest extends TestCase
         $items = [
             MapItem::create(
                 TextStringObject::create('key1'),
-                TextStringObject::create('value1')
+                TextStringObject::create('value1'),
             ),
             MapItem::create(
                 TextStringObject::create('key2'),
-                TextStringObject::create('value2')
-            )
+                TextStringObject::create('value2'),
+            ),
         ];
 
         $map = CanonicalMapObject::create($items);
@@ -59,15 +59,15 @@ class CanonicalMapObjectTest extends TestCase
     public function test_add_items(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
-        
+
         $map->add(
             TextStringObject::create('key2'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
 
         $this->assertCount(2, $map);
@@ -79,27 +79,27 @@ class CanonicalMapObjectTest extends TestCase
     public function test_canonical_sorting_by_length(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         // Add keys in non-sorted order
         $map->add(
             TextStringObject::create('longkey'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
         $map->add(
             TextStringObject::create('key'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
         $map->add(
             TextStringObject::create('a'),
-            TextStringObject::create('value3')
+            TextStringObject::create('value3'),
         );
 
         $cbor = (string) $map;
-        
+
         // Shorter keys should appear first in CBOR encoding
         // We can verify this by checking the encoded string contains keys in order
         $this->assertNotEmpty($cbor);
-        
+
         // The CBOR should start with map marker
         $firstByte = ord($cbor[0]);
         $majorType = $firstByte >> 5;
@@ -112,26 +112,26 @@ class CanonicalMapObjectTest extends TestCase
     public function test_canonical_sorting_by_byte_value(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         // Add keys of same length in non-sorted order
         $map->add(
             TextStringObject::create('zebra'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
         $map->add(
             TextStringObject::create('apple'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
         $map->add(
             TextStringObject::create('mango'),
-            TextStringObject::create('value3')
+            TextStringObject::create('value3'),
         );
 
         $cbor = (string) $map;
-        
+
         // Verify it produces valid CBOR
         $this->assertNotEmpty($cbor);
-        
+
         // First byte should indicate a map
         $firstByte = ord($cbor[0]);
         $majorType = $firstByte >> 5;
@@ -144,19 +144,18 @@ class CanonicalMapObjectTest extends TestCase
     public function test_normalize(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
         $map->add(
             TextStringObject::create('key2'),
-            UnsignedIntegerObject::create(42)
+            UnsignedIntegerObject::create(42),
         );
 
         $normalized = $map->normalize();
 
-        $this->assertIsArray($normalized);
         $this->assertArrayHasKey('key1', $normalized);
         $this->assertArrayHasKey('key2', $normalized);
         $this->assertSame('value1', $normalized['key1']);
@@ -172,14 +171,13 @@ class CanonicalMapObjectTest extends TestCase
         $items = [
             MapItem::create(
                 TextStringObject::create('key1'),
-                TextStringObject::create('value1')
-            )
+                TextStringObject::create('value1'),
+            ),
         ];
 
         $map = CanonicalMapObject::create($items);
         $value = $map->getValue();
 
-        $this->assertIsArray($value);
         $this->assertContainsOnlyInstancesOf(MapItem::class, $value);
     }
 
@@ -191,14 +189,13 @@ class CanonicalMapObjectTest extends TestCase
         $items = [
             MapItem::create(
                 TextStringObject::create('key1'),
-                TextStringObject::create('value1')
-            )
+                TextStringObject::create('value1'),
+            ),
         ];
 
         $map = CanonicalMapObject::create($items);
         $data = $map->getData();
 
-        $this->assertIsArray($data);
         $this->assertContainsOnlyInstancesOf(MapItem::class, $data);
     }
 
@@ -208,21 +205,21 @@ class CanonicalMapObjectTest extends TestCase
     public function test_count(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $this->assertCount(0, $map);
-        
+
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
-        
+
         $this->assertCount(1, $map);
-        
+
         $map->add(
             TextStringObject::create('key2'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
-        
+
         $this->assertCount(2, $map);
     }
 
@@ -232,14 +229,14 @@ class CanonicalMapObjectTest extends TestCase
     public function test_iterator(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
         $map->add(
             TextStringObject::create('key2'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
 
         $items = [];
@@ -259,11 +256,11 @@ class CanonicalMapObjectTest extends TestCase
         $map = CanonicalMapObject::create();
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
 
-        $this->assertTrue(isset($map['key1']));
-        $this->assertFalse(isset($map['nonexistent']));
+        $this->assertTrue($map->offsetExists('key1'));
+        $this->assertFalse($map->offsetExists('nonexistent'));
     }
 
     /**
@@ -274,12 +271,12 @@ class CanonicalMapObjectTest extends TestCase
         $map = CanonicalMapObject::create();
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
 
         $item = $map['key1'];
         $this->assertInstanceOf(MapItem::class, $item);
-        
+
         $this->assertNull($map['nonexistent']);
     }
 
@@ -289,14 +286,14 @@ class CanonicalMapObjectTest extends TestCase
     public function test_array_access_offset_set(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $map['key1'] = MapItem::create(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
 
         $this->assertCount(1, $map);
-        $this->assertTrue(isset($map['key1']));
+        $this->assertTrue($map->offsetExists('key1'));
     }
 
     /**
@@ -307,19 +304,19 @@ class CanonicalMapObjectTest extends TestCase
         $map = CanonicalMapObject::create();
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
         $map->add(
             TextStringObject::create('key2'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
 
         $this->assertCount(2, $map);
-        
+
         unset($map['key1']);
-        
+
         $this->assertCount(1, $map);
-        $this->assertFalse(isset($map['key1']));
+        $this->assertFalse($map->offsetExists('key1'));
     }
 
     /**
@@ -330,14 +327,13 @@ class CanonicalMapObjectTest extends TestCase
         $map = CanonicalMapObject::create();
         $map->add(
             TextStringObject::create('type'),
-            TextStringObject::create('plc_operation')
+            TextStringObject::create('plc_operation'),
         );
 
         $cbor = (string) $map;
 
-        $this->assertIsString($cbor);
         $this->assertNotEmpty($cbor);
-        
+
         // Should start with CBOR map marker
         $firstByte = ord($cbor[0]);
         $majorType = $firstByte >> 5;
@@ -346,7 +342,7 @@ class CanonicalMapObjectTest extends TestCase
 
     /**
      * Test canonical sorting matches RFC 8949 section 3.9.
-     * 
+     *
      * Keys should be sorted:
      * 1. First by length (shorter first)
      * 2. Then by byte value (lexicographic)
@@ -354,7 +350,7 @@ class CanonicalMapObjectTest extends TestCase
     public function test_rfc_8949_canonical_sorting(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         // Add keys in specific order to test sorting
         $map->add(TextStringObject::create('sig'), TextStringObject::create('v1'));
         $map->add(TextStringObject::create('prev'), TextStringObject::create('v2'));
@@ -365,17 +361,17 @@ class CanonicalMapObjectTest extends TestCase
         $map->add(TextStringObject::create('verificationMethods'), TextStringObject::create('v7'));
 
         $cbor = (string) $map;
-        
+
         // Expected order by length: sig(3), prev(4), type(4), services(8), alsoKnownAs(11), rotationKeys(12), verificationMethods(19)
         // When lengths are equal (prev/type), lexicographic order applies
-        
+
         $this->assertNotEmpty($cbor);
-        
+
         // The data should be properly encoded as CBOR map
         $firstByte = ord($cbor[0]);
         $majorType = $firstByte >> 5;
         $additionalInfo = $firstByte & 0x1F;
-        
+
         $this->assertSame(5, $majorType);
         $this->assertSame(7, $additionalInfo); // 7 items in map
     }
@@ -386,19 +382,19 @@ class CanonicalMapObjectTest extends TestCase
     public function test_duplicate_keys_overwrite(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value1')
+            TextStringObject::create('value1'),
         );
-        
+
         $map->add(
             TextStringObject::create('key1'),
-            TextStringObject::create('value2')
+            TextStringObject::create('value2'),
         );
 
         $this->assertCount(1, $map);
-        
+
         $normalized = $map->normalize();
         $this->assertSame('value2', $normalized['key1']);
     }
@@ -409,14 +405,14 @@ class CanonicalMapObjectTest extends TestCase
     public function test_map_with_null_values(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $map->add(
             TextStringObject::create('prev'),
-            \CBOR\OtherObject\NullObject::create()
+            \CBOR\OtherObject\NullObject::create(),
         );
 
         $normalized = $map->normalize();
-        
+
         $this->assertArrayHasKey('prev', $normalized);
         $this->assertNull($normalized['prev']);
     }
@@ -427,16 +423,16 @@ class CanonicalMapObjectTest extends TestCase
     public function test_nested_structures(): void
     {
         $map = CanonicalMapObject::create();
-        
+
         $innerMap = \CBOR\MapObject::create();
         $innerMap->add(
             TextStringObject::create('nested_key'),
-            TextStringObject::create('nested_value')
+            TextStringObject::create('nested_value'),
         );
-        
+
         $map->add(
             TextStringObject::create('outer'),
-            $innerMap
+            $innerMap,
         );
 
         $cbor = (string) $map;

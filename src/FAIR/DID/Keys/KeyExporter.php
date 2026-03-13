@@ -3,7 +3,7 @@
 /**
  * Key Exporter class for exporting keys in various formats.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 
 declare(strict_types=1);
@@ -17,7 +17,7 @@ use Exception;
  *
  * Provides methods to export keys in JSON, text, and environment variable formats.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 class KeyExporter
 {
@@ -107,10 +107,17 @@ class KeyExporter
      * @param bool $include_private Whether to include the private key.
      * @param int  $flags           JSON encoding flags.
      * @return string The JSON string.
+     * @throws Exception If the key data cannot be encoded as JSON.
      */
     public function to_json(bool $include_private = false, int $flags = JSON_PRETTY_PRINT): string
     {
-        return json_encode($this->to_array($include_private), $flags);
+        $json = json_encode($this->to_array($include_private), $flags);
+
+        if ($json === false) {
+            throw new Exception('Failed to encode key data as JSON.');
+        }
+
+        return $json;
     }
 
     /**
@@ -132,12 +139,12 @@ class KeyExporter
         if (null !== $file_path) {
             $dir = dirname($file_path);
             if (!is_dir($dir)) {
-                mkdir($dir, 0700, true);
+                mkdir($dir, 0o700, true);
             }
             if (file_put_contents($file_path, $output) === false) {
                 return false;
             }
-            chmod($file_path, 0600);
+            chmod($file_path, 0o600);
             return true;
         }
 

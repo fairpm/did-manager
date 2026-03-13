@@ -34,6 +34,7 @@ final-controller = { enabled = false }
 function-name = { enabled = false }
 halstead = { enabled = false }
 interface-name = { enabled = false }
+kan-defect = { enabled = false }
 literal-named-argument = { enabled = false }
 no-assign-in-condition = { enabled = false }
 no-boolean-flag-parameter = { enabled = false }
@@ -75,9 +76,11 @@ ignore = [
     "invalid-argument", # bizarre inference failures, also doesn't grok list<>
     "invalid-array-index", # doesn't allow non-negative-int
     "invalid-destructuring-source", # thinks collections are `mixed`
+    "invalid-iterator", # deferred until array shape annotations are tightened
     "invalid-method-access", # completely broken with laravel
     "invalid-operand", # prevents useful control-flow shorthand.  would enable if it allowed void context.
     "invalid-return-statement", # broken when `static` return type is involved anywhere
+    "less-specific-argument", # deferred until collection and array-shape typing is improved
     "less-specific-nested-argument-type", # fails on every single test.  need to disable this just for tests/
     "less-specific-nested-return-statement", # can't deal with collection method chaining
     "less-specific-return-statement", # deferred
@@ -87,6 +90,7 @@ ignore = [
     "mixed-argument", # poor type inference
     "mixed-array-access", # completely broken, fails to infer an array even when it's the only return type
     "mixed-array-assignment", # broken in the same fashion as mixed-array-access
+    "mixed-array-index", # deferred until key types are annotated more precisely
     "mixed-assignment", # complete non-starter, seems to do no type inference at all
     "mixed-method-access", # might have some use if i could disable it on tests
     "mixed-operand", # forbids even truthiness checks without a known type
@@ -95,13 +99,16 @@ ignore = [
     "no-value", # infers 'never' for local variables that were guarded with !empty() on the line immediately above
     "non-documented-method", # misses docblocks that are quite plainly present
     "non-documented-property", # misses docblocks that are quite plainly present
+    "non-existent-class-like", # path dependency symbols are not resolved consistently by mago
     "non-existent-method", # cannot handle magic methods at all, making it a non-starter with laravel
     "non-existent-property", # also lacks magic support.  ironic for something called mago.
     "null-argument", # fails to read type from @property-read
     "null-array-index", # fails to read type from @property-read
     "null-operand", # fails to read type from @property-read
     "null-property-access", # fails to read type from @property-read
+    "nullable-return-statement", # deferred until defensive wrapping is tightened around vendor APIs
     "possibly-invalid-argument", # deferred
+    "possibly-false-argument", # deferred until false-returning builtins are wrapped consistently
     "possibly-null-argument", # basic type inference failures
     "possibly-null-array-access", # fails to read type from @property-read
     "possibly-null-array-index", # more trouble with the __() function
@@ -116,6 +123,7 @@ ignore = [
     "undefined-string-array-index", # won't even _assign_ to arbitrary arrays
     "undefined-variable", # can't handle Pest's use of $this
     "unhandled-thrown-type", # we will not globally enforce checked exceptions
+    "unsafe-instantiation", # accepted for current static factory pattern
     "unused-parameter", # too common a case to warn about
     "unused-statement", # too common a case to warn about
 ]

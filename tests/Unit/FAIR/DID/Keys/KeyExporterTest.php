@@ -3,7 +3,7 @@
 /**
  * KeyExporter Tests
  *
- * @package FairDidManager\Tests\Keys
+ * @package Tests\Unit\FAIR\DID\Keys
  */
 
 declare(strict_types=1);

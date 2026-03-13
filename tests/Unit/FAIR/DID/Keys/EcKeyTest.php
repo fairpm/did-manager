@@ -3,7 +3,7 @@
 /**
  * EcKey Tests
  *
- * @package FairDidManager\Tests\Keys
+ * @package Tests\Unit\FAIR\DID\Keys
  */
 
 declare(strict_types=1);
@@ -131,7 +131,6 @@ class EcKeyTest extends TestCase
         $signature = $key->sign($data);
 
         $this->assertNotEmpty($signature);
-        $this->assertIsString($signature);
     }
 
     /**

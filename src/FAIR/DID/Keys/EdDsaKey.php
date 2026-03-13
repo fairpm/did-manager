@@ -3,7 +3,7 @@
 /**
  * EdDSA Key class for Ed25519 curve.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 
 declare(strict_types=1);
@@ -20,7 +20,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * Uses the simplito/elliptic-php library for Ed25519 operations.
  *
- * @package FairDidManager\Keys
+ * @package FAIR\DID\Keys
  */
 class EdDsaKey implements Key
 {

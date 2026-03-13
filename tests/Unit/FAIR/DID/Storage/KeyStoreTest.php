@@ -3,14 +3,14 @@
 /**
  * KeyStore Tests
  *
- * @package FairDidManager\Tests\Storage
+ * @package Tests\Unit\FAIR\DID\Storage
  */
 
 declare(strict_types=1);
 
 namespace Tests\Unit\FAIR\DID\Storage;
 
-use FAIR\DID\Sorage\KeyStore;
+use FAIR\DID\Storage\KeyStore;
 use PHPUnit\Framework\TestCase;
 
 /**

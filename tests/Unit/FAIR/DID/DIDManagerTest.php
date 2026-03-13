@@ -12,7 +12,7 @@ namespace Tests\Unit\FAIR\DID;
 
 use FAIR\DID\DIDManager;
 use FAIR\DID\PLC\PlcClient;
-use FAIR\DID\Sorage\KeyStore;
+use FAIR\DID\Storage\KeyStore;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -74,7 +74,6 @@ class DIDManagerTest extends TestCase
 
         $list = $manager->list_local_dids();
 
-        $this->assertIsArray($list);
         $this->assertEmpty($list);
     }
 

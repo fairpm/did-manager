@@ -3,7 +3,7 @@
 /**
  * DidCodec Tests
  *
- * @package FairDidManager\Tests\Crypto
+ * @package Tests\Unit\FAIR\DID\Crypto
  */
 
 declare(strict_types=1);
@@ -184,7 +184,6 @@ class DidCodecTest extends TestCase
         $signature = $key->sign($data);
 
         $this->assertNotEmpty($signature);
-        $this->assertIsString($signature);
     }
 
     /**
@@ -198,7 +197,6 @@ class DidCodecTest extends TestCase
         $signature = $key->sign($data);
 
         $this->assertNotEmpty($signature);
-        $this->assertIsString($signature);
     }
 
     /**
@@ -261,7 +259,6 @@ class DidCodecTest extends TestCase
         $signed_operation = DidCodec::sign_plc_operation($operation, $rotation_key);
 
         $this->assertNotNull($signed_operation->sig);
-        $this->assertIsString($signed_operation->sig);
     }
 
     /**

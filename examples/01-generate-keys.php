@@ -5,7 +5,7 @@
  * This example demonstrates how to generate different types of key pairs
  * used for DID operations.
  *
- * @package FairDidManager\Examples
+ * @package FAIR\DID\Examples
  */
 
 declare(strict_types=1);

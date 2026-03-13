@@ -1,6 +1,6 @@
-# FAIR CLI Examples
+# FAIR DID Manager Examples
 
-This directory contains example scripts demonstrating how to use the FAIR CLI library.
+This directory contains example scripts for the generic `fairpm/did-manager` package.
 
 ## Running Examples
 
@@ -11,8 +11,8 @@ cd did-manager
 php examples/01-generate-keys.php
 php examples/02-plc-operations.php
 php examples/03-key-storage.php
-php examples/04-parse-plugin-headers.php
-php examples/05-generate-metadata.php
+php examples/04-export-keys.php
+php examples/05-generate-and-submit-did.php
 ```
 
 ## Example Overview
@@ -43,43 +43,7 @@ Demonstrates local key storage:
 - Update metadata and keys
 - Deactivate and delete DIDs
 
-### 04-parse-plugin-headers.php
-Demonstrates WordPress plugin/theme header parsing:
-- Parse standard plugin headers
-- Parse minimal headers
-- Parse from files
-- Handle plugins without Plugin ID
-- Parse theme headers (style.css)
-
-### 05-generate-metadata.php
-Demonstrates FAIR metadata generation:
-- Parse plugin headers and readme files
-- Generate metadata.json structure
-- Add DID to metadata
-- Override slug
-- Inspect full metadata structure
-- Output as formatted JSON
-
-## CLI Commands
-
-The FAIR CLI also provides command-line tools:
-
-```bash
-# Generate a new DID
-php did-manager.php did:create --handle my-plugin
-
-# List local DIDs
-php did-manager.php did:list
-
-# Resolve a DID
-php did-manager.php did:resolve did:plc:abc123
-
-# Generate metadata for a plugin
-php did-manager.php metadata:generate /path/to/plugin
-
-# Rotate keys for a DID
-php did-manager.php key:rotate did:plc:abc123
-```
+WordPress-specific examples were moved to the `did-manager-wordpress` package.
 
 ## Namespaces
 
@@ -87,12 +51,11 @@ The library uses the following namespaces:
 
 | Namespace | Description |
 |-----------|-------------|
-| `FairDidManager\Keys` | Key interface and implementations (EcKey, EdDsaKey, KeyFactory) |
-| `FairDidManager\Crypto` | Cryptographic utilities (DidCodec, CanonicalMapObject) |
-| `FairDidManager\Plc` | PLC directory interaction (PlcOperation, PlcClient) |
-| `FairDidManager\Storage` | Local storage (KeyStore) |
-| `FairDidManager\Parsers` | WordPress metadata parsing (PluginHeaderParser, ReadmeParser, MetadataGenerator) |
-| `FairDidManager\Did` | DID lifecycle management (FairDidManager) |
+| `FAIR\DID\Keys` | Key interface and implementations (EcKey, EdDsaKey, KeyFactory) |
+| `FAIR\DID\Crypto` | Cryptographic utilities (DidCodec, CanonicalMapObject) |
+| `FAIR\DID\PLC` | PLC directory interaction (PlcOperation, PlcClient) |
+| `FAIR\DID\Storage` | Local storage (KeyStore) |
+| `FAIR\DID` | DID lifecycle management (DIDManager) |
 
 ## Quick Start
 
@@ -100,17 +63,16 @@ The library uses the following namespaces:
 <?php
 require_once 'vendor/autoload.php';
 
-use FairDidManager\Crypto\DidCodec;
-use FairDidManager\Storage\KeyStore;
-use FairDidManager\Plc\PlcClient;
-use FairDidManager\Did\FairDidManager;
+use FAIR\DID\DIDManager;
+use FAIR\DID\PLC\PlcClient;
+use FAIR\DID\Storage\KeyStore;
 
 // Initialize components
 $store = new KeyStore('/path/to/keys.json');
 $client = new PlcClient();
-$manager = new FairDidManager($store, $client);
+$manager = new DIDManager($store, $client);
 
 // Create a new DID
-$result = $manager->create_did('my-plugin-handle');
+$result = $manager->create_did('example-package');
 echo "Created DID: " . $result['did'];
 ```

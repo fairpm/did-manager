@@ -3,7 +3,7 @@
 /**
  * DID Codec - Multibase, Canonical JSON, and Signing Helpers
  *
- * @package FairDidManager\Crypto
+ * @package FAIR\DID\Crypto
  */
 
 declare(strict_types=1);
@@ -19,19 +19,19 @@ use YOCLIB\Multiformats\Multibase\Multibase;
 /**
  * DID Codec class for multibase, canonical JSON, and signing helpers.
  *
- * @package FairDidManager\Crypto
+ * @package FAIR\DID\Crypto
  */
 class DidCodec
 {
     /**
      * Multicodec prefix for secp256k1 public key (0xe7)
      */
-    public const MULTICODEC_SECP256K1_PUB = "\xe7\x01";
+    public const string MULTICODEC_SECP256K1_PUB = "\xe7\x01";
 
     /**
      * Multicodec prefix for Ed25519 public key (0xed)
      */
-    public const MULTICODEC_ED25519_PUB = "\xed\x01";
+    public const string MULTICODEC_ED25519_PUB = "\xed\x01";
 
     /**
      * Convert a public key to multibase base58btc format
@@ -80,7 +80,13 @@ class DidCodec
     public static function canonical_json(mixed $data): string
     {
         $sorted = self::recursive_key_sort($data);
-        return json_encode($sorted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $encoded = json_encode($sorted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        if (false === $encoded) {
+            throw new \RuntimeException('Failed to encode canonical JSON.');
+        }
+
+        return $encoded;
     }
 
     /**
