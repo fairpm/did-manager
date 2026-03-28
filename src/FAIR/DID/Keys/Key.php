@@ -22,47 +22,47 @@ interface Key
     /**
      * Curve constant for secp256k1.
      */
-    public const string CURVE_K256 = 'secp256k1';
+    public const CURVE_K256 = 'secp256k1';
 
     /**
      * Curve constant for P-256.
      */
-    public const string CURVE_P256 = 'p256';
+    public const CURVE_P256 = 'p256';
 
     /**
      * Curve constant for Ed25519.
      */
-    public const string CURVE_ED25519 = 'ed25519';
+    public const CURVE_ED25519 = 'ed25519';
 
     /**
      * Multicodec prefix for secp256k1 public key.
      */
-    public const string PREFIX_K256_PUB = "\xe7\x01";
+    public const PREFIX_K256_PUB = "\xe7\x01";
 
     /**
      * Multicodec prefix for secp256k1 private key.
      */
-    public const string PREFIX_K256_PRIV = "\x81\x26";
+    public const PREFIX_K256_PRIV = "\x81\x26";
 
     /**
      * Multicodec prefix for P-256 public key.
      */
-    public const string PREFIX_P256_PUB = "\x80\x24";
+    public const PREFIX_P256_PUB = "\x80\x24";
 
     /**
      * Multicodec prefix for P-256 private key.
      */
-    public const string PREFIX_P256_PRIV = "\x06\x26";
+    public const PREFIX_P256_PRIV = "\x06\x26";
 
     /**
      * Multicodec prefix for Ed25519 public key.
      */
-    public const string PREFIX_ED25519_PUB = "\xed\x01";
+    public const PREFIX_ED25519_PUB = "\xed\x01";
 
     /**
      * Multicodec prefix for Ed25519 private key.
      */
-    public const string PREFIX_ED25519_PRIV = "\x80\x26";
+    public const PREFIX_ED25519_PRIV = "\x80\x26";
 
     /**
      * Does this key represent a private key?

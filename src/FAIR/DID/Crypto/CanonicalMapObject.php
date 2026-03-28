@@ -32,7 +32,7 @@ use IteratorAggregate;
  */
 class CanonicalMapObject extends AbstractCBORObject implements \Countable, IteratorAggregate, Normalizable, ArrayAccess
 {
-    private const int MAJOR_TYPE = self::MAJOR_TYPE_MAP;
+    private const MAJOR_TYPE = self::MAJOR_TYPE_MAP;
 
     /**
      * The map data.
