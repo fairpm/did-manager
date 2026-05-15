@@ -12,7 +12,7 @@
 
 ## Requirements
 
-- PHP 8.3 or higher
+- PHP 8.0 or higher
 - Composer
 - Extensions: `curl`, `json`
 
