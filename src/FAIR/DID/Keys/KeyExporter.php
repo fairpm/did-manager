@@ -139,12 +139,12 @@ class KeyExporter
         if (null !== $file_path) {
             $dir = dirname($file_path);
             if (!is_dir($dir)) {
-                mkdir($dir, 0o700, true);
+                mkdir($dir, 0700, true);
             }
             if (file_put_contents($file_path, $output) === false) {
                 return false;
             }
-            chmod($file_path, 0o600);
+            chmod($file_path, 0600);
             return true;
         }
 
