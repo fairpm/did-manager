@@ -74,10 +74,19 @@ WordPress examples were moved to the `did-manager-wordpress` package.
 ## Testing
 
 ```bash
-composer test
 composer lint
 composer analyze
+composer test
 ```
+
+Formatting can be applied with:
+
+```bash
+composer lint
+composer format
+```
+
+The project uses a custom PSR-12-derived PHPCS ruleset for coding standards, PHPStan for static analysis, and PHPUnit for tests.
 
 ## Related Packages
 
