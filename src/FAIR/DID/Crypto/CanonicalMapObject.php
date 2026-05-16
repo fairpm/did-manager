@@ -30,7 +30,11 @@ use IteratorAggregate;
  * @implements IteratorAggregate<array-key, MapItem>
  * @implements ArrayAccess<array-key, MapItem>
  */
-class CanonicalMapObject extends AbstractCBORObject implements \Countable, IteratorAggregate, Normalizable, ArrayAccess
+final class CanonicalMapObject extends AbstractCBORObject implements
+    \Countable,
+    IteratorAggregate,
+    Normalizable,
+    ArrayAccess
 {
     private const MAJOR_TYPE = self::MAJOR_TYPE_MAP;
 

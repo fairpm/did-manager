@@ -24,7 +24,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * @package FAIR\DID\Keys
  */
-class EcKey implements Key
+final class EcKey implements Key
 {
     /**
      * Constructor.
@@ -35,7 +35,8 @@ class EcKey implements Key
     public function __construct(
         protected KeyPair $keypair,
         protected string $curve,
-    ) {}
+    ) {
+    }
 
     /**
      * Does this key represent a private key?

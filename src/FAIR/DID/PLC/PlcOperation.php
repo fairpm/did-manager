@@ -361,7 +361,6 @@ class PlcOperation implements JsonSerializable
      */
     public static function base64url_encode(string $data): string
     {
-        // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
@@ -376,7 +375,6 @@ class PlcOperation implements JsonSerializable
         $translated = strtr($data, '-_', '+/');
         $padding = (4 - (strlen($translated) % 4)) % 4;
         $padded = str_pad($translated, strlen($translated) + $padding, '=', STR_PAD_RIGHT);
-        // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
         $decoded = base64_decode($padded, true);
 
         if (false === $decoded) {

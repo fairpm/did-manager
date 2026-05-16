@@ -22,7 +22,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * @package FAIR\DID\Keys
  */
-class EdDsaKey implements Key
+final class EdDsaKey implements Key
 {
     /**
      * Constructor.
@@ -33,7 +33,8 @@ class EdDsaKey implements Key
     public function __construct(
         protected KeyPair $keypair,
         protected string $curve,
-    ) {}
+    ) {
+    }
 
     /**
      * Does this key represent a private key?
@@ -149,7 +150,7 @@ class EdDsaKey implements Key
         $eddsa = new EdDSA($curve);
 
         $stripped = bin2hex(substr($decoded, 2));
-        $keypair = $eddsa->keyFromPublic($stripped, 'hex');
+        $keypair = $eddsa->keyFromPublic($stripped);
         return new static($keypair, $curve);
     }
 
@@ -176,7 +177,7 @@ class EdDsaKey implements Key
         $eddsa = new EdDSA($curve);
 
         $stripped = bin2hex(substr($decoded, 2));
-        $keypair = $eddsa->keyFromSecret($stripped, 'hex');
+        $keypair = $eddsa->keyFromSecret($stripped);
         return new static($keypair, $curve);
     }
 
