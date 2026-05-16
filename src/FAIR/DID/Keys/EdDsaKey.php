@@ -22,7 +22,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * @package FAIR\DID\Keys
  */
-final class EdDsaKey implements Key
+class EdDsaKey implements Key
 {
     /**
      * Constructor.

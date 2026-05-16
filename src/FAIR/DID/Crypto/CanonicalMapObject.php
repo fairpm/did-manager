@@ -30,7 +30,7 @@ use IteratorAggregate;
  * @implements IteratorAggregate<array-key, MapItem>
  * @implements ArrayAccess<array-key, MapItem>
  */
-final class CanonicalMapObject extends AbstractCBORObject implements
+class CanonicalMapObject extends AbstractCBORObject implements
     \Countable,
     IteratorAggregate,
     Normalizable,

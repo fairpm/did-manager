@@ -24,7 +24,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * @package FAIR\DID\Keys
  */
-final class EcKey implements Key
+class EcKey implements Key
 {
     /**
      * Constructor.
