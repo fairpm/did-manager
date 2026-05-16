@@ -5,6 +5,31 @@ on:
   pull_request:
 
 jobs:
+  lint-analyze:
+    runs-on: ubuntu-24.04
+    name: Lint and Analyze
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4' # Use the latest supported PHP version for linting and static analysis.
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Lint
+        run: composer lint
+
+      - name: Analyze
+        run: composer analyze
+
   test:
     runs-on: ubuntu-24.04
     strategy:
@@ -27,17 +52,8 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: Validate composer.json
-        run: composer validate --strict
-
       - name: Install dependencies
         run: composer install
-
-      - name: Lint
-        run: composer lint
-
-      - name: Analyze
-        run: composer analyze
 
       - name: Test
         run: composer test
