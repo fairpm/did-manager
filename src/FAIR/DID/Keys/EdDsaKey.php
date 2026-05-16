@@ -19,7 +19,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  * EdDSA Key class for Ed25519 curve.
  *
  * Uses the simplito/elliptic-php library for Ed25519 operations.
- * 
+ *
  * @phpstan-consistent-constructor -- trust extending classes to also override the helpers if constructor changes.
  *
  * @package FAIR\DID\Keys

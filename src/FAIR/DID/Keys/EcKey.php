@@ -21,7 +21,7 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  * EC Key class for elliptic curve cryptography.
  *
  * Supports secp256k1 (K-256) and P-256 curves using the simplito/elliptic-php library.
- * 
+ *
  * @phpstan-consistent-constructor -- trust extending classes to also override the helpers if constructor changes.
  *
  * @package FAIR\DID\Keys
