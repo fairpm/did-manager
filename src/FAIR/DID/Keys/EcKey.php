@@ -22,6 +22,8 @@ use YOCLIB\Multiformats\Multibase\Multibase;
  *
  * Supports secp256k1 (K-256) and P-256 curves using the simplito/elliptic-php library.
  *
+ * @phpstan-consistent-constructor -- trust extending classes to also override the helpers if constructor changes.
+ *
  * @package FAIR\DID\Keys
  */
 class EcKey implements Key
@@ -35,7 +37,8 @@ class EcKey implements Key
     public function __construct(
         protected KeyPair $keypair,
         protected string $curve,
-    ) {}
+    ) {
+    }
 
     /**
      * Does this key represent a private key?

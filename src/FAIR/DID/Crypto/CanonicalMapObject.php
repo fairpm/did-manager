@@ -26,11 +26,17 @@ use IteratorAggregate;
  * This implements section 3.9 canonicalization of RFC 8949:
  * Sort keys by length first, then by byte value.
  *
+ * @phpstan-consistent-constructor -- trust extending classes to also override the helpers if constructor changes.
+ *
  * @see https://datatracker.ietf.org/doc/html/rfc8949#section-4.2
  * @implements IteratorAggregate<array-key, MapItem>
  * @implements ArrayAccess<array-key, MapItem>
  */
-class CanonicalMapObject extends AbstractCBORObject implements \Countable, IteratorAggregate, Normalizable, ArrayAccess
+class CanonicalMapObject extends AbstractCBORObject implements
+    \Countable,
+    IteratorAggregate,
+    Normalizable,
+    ArrayAccess
 {
     private const MAJOR_TYPE = self::MAJOR_TYPE_MAP;
 

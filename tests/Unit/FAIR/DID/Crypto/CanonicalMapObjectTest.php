@@ -362,7 +362,8 @@ class CanonicalMapObjectTest extends TestCase
 
         $cbor = (string) $map;
 
-        // Expected order by length: sig(3), prev(4), type(4), services(8), alsoKnownAs(11), rotationKeys(12), verificationMethods(19)
+        // Expected order by length: sig(3), prev(4), type(4), services(8),
+        // alsoKnownAs(11), rotationKeys(12), verificationMethods(19)
         // When lengths are equal (prev/type), lexicographic order applies
 
         $this->assertNotEmpty($cbor);

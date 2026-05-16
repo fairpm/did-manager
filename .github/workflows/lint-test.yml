@@ -1,0 +1,59 @@
+name: Lint and Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-analyze:
+    runs-on: ubuntu-24.04
+    name: Lint and Analyze
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4' # Use the latest supported PHP version for linting and static analysis.
+          coverage: none
+          tools: composer:v2
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Lint
+        run: composer lint
+
+      - name: Analyze
+        run: composer analyze
+
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - '8.0'
+          - '8.1'
+          - '8.2'
+          - '8.3'
+          - '8.4'
+    name: PHP ${{ matrix.php-version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install
+
+      - name: Test
+        run: composer test
