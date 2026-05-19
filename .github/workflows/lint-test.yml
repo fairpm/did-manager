@@ -4,15 +4,20 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint-analyze:
     runs-on: ubuntu-24.04
     name: Lint and Analyze
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: '8.4' # Use the latest supported PHP version for linting and static analysis.
           coverage: none
@@ -43,10 +48,12 @@ jobs:
           - '8.4'
     name: PHP ${{ matrix.php-version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          persist-credentials: false
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # 2.37.1
         with:
           php-version: ${{ matrix.php-version }}
           coverage: none
